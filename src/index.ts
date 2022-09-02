@@ -1,18 +1,16 @@
 // dotenv 不会覆盖原有值。
-import dotenv from 'dotenv'
+import 'dotenv-flow/config'
 import { logicError } from '@tsdy/express-plugin-exception'
 import bodyParser from 'body-parser'
 import express, { NextFunction, Request, Response } from 'express'
-import { CorsMiddleware } from './middleware/cors'
-import { router } from './router'
+import { CorsMiddleware } from '@/middleware/cors'
+import router from '@/packages'
 import { swagger } from './swagger'
-import { mongodbInit } from './model'
-import { resolve } from 'path'
+import { initialize } from './model'
 
-dotenv.config({ path: resolve('.env.local') })
 const app = express()
 async function bootstrap() {
-    await mongodbInit()
+    await initialize()
     app.use(bodyParser.json())
     app.use('*', CorsMiddleware)
     app.use('/api', router)
