@@ -1,4 +1,4 @@
-import { HelloWorld } from '@/packages/helloworld/model'
+import { User } from '@/entity/User'
 import { DataSource } from 'typeorm'
 export const model = new DataSource({
     type: 'mysql',
@@ -8,7 +8,7 @@ export const model = new DataSource({
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
     synchronize: true,
-    entities: [HelloWorld],
+    entities: [User],
 })
 
 export const initialize = model.initialize.bind(model)

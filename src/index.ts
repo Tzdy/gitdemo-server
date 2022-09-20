@@ -4,7 +4,7 @@ import { logicError } from '@tsdy/express-plugin-exception'
 import bodyParser from 'body-parser'
 import express, { NextFunction, Request, Response } from 'express'
 import { CorsMiddleware } from '@/middleware/cors'
-import router from '@/packages'
+import router from '@/router'
 import { swagger } from './swagger'
 import { initialize } from './model'
 

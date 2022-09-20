@@ -8,7 +8,7 @@ export function swagger(app: Application) {
             swagger: '2.0',
             tags: [
                 {
-                    name: 'auth',
+                    name: 'Auth',
                     description: '用户权限。',
                 },
             ],
@@ -20,8 +20,8 @@ export function swagger(app: Application) {
                     email: 'apiteam@swagger.io',
                 },
             },
-            host: 'localhost:10086',
-            basePath: '/',
+            host: `${process.env.HOST}:${process.env.PORT}`,
+            basePath: process.env.BASE,
             securityDefinitions: {
                 token: {
                     type: 'apiKey',

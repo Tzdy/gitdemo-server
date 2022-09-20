@@ -17,6 +17,9 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'jest'
-  ]
+  ],
+  rules: {
+    'no-useless-constructor': 'off'
+  }
 
 }

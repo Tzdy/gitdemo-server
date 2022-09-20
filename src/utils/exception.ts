@@ -6,3 +6,10 @@ export class HttpOKException extends HttpException {
         this.resData.code = code
     }
 }
+
+export class HttpAuthException extends HttpException {
+    constructor(code: number, message: string) {
+        super(401, message)
+        this.resData.code = code
+    }
+}
