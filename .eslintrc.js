@@ -5,7 +5,6 @@ module.exports = {
     "jest/globals": true
   },
   extends: [
-    'standard',
     // eslint 检查代码质量， prettier处理代码风格
     'eslint-config-prettier'
   ],
@@ -18,8 +17,4 @@ module.exports = {
     '@typescript-eslint',
     'jest'
   ],
-  rules: {
-    'no-useless-constructor': 'off'
-  }
-
 }

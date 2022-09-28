@@ -1,5 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
-import { IsString, IsByteLength } from 'class-validator'
+import { IsString, IsByteLength, IsAlpha } from 'class-validator'
 
 export class LoginReqDto {
     @ApiProperty({
@@ -112,7 +112,8 @@ export class RegisterReqDto {
         type: 'string',
     })
     @IsString()
-    @IsByteLength(6, 12)
+    @IsAlpha()
+    @IsByteLength(3, 18)
     username: string
 
     @ApiProperty({

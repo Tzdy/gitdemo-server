@@ -1,6 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity('repos')
+export enum RepoType {
+    PUBLIC = 0,
+    PRIVATE = 1,
+}
+
+@Entity('repo')
+@Index(['user_id', 'repo_name'], { unique: true })
 export class Repo {
     @PrimaryGeneratedColumn()
     id: number
@@ -8,8 +14,12 @@ export class Repo {
     @Column()
     user_id: number
 
-    @Column()
-    default_branch_id: number
+    @Column({
+        type: 'enum',
+        enum: RepoType,
+        default: RepoType.PUBLIC,
+    })
+    type: RepoType
 
     @Column()
     repo_name: string

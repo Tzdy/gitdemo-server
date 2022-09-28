@@ -1,18 +1,18 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { AfterLoad, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity('users')
+@Entity('user')
 export class User {
     @PrimaryGeneratedColumn()
     id: number
 
     @Column({
         unique: true,
-        type: 'varbinary',
+        collation: 'utf8_bin',
     })
     username: string
 
     @Column({
-        type: 'varbinary',
+        collation: 'utf8_bin',
     })
     password: string
 
