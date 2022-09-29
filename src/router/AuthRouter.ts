@@ -1,6 +1,7 @@
 import { InfoResDto, InfoReqDto } from '@/dto/auth/getInfoDto'
 import { LoginResDto, LoginReqDto } from '@/dto/auth/loginDto'
 import { RegisterResDto, RegisterReqDto } from '@/dto/auth/registryDto'
+import { SetInfoReqDto, SetInfoResDto } from '@/dto/auth/setInfoDto'
 import { TokenMiddleWare } from '@/middleware/token'
 import { AuthServiceImpl } from '@/service/impl/AuthServiceImpl'
 import {
@@ -37,5 +38,13 @@ export class AuthRouter {
     @ApiResponse(200, InfoResDto)
     async info(@Body() body: InfoReqDto, @TokenPlyload('id') id: number) {
         return await this.authService.info(id)
+    }
+
+    @Post('set_info')
+    @UseGuards(TokenMiddleWare)
+    @ApiSecurity('token')
+    @ApiResponse(200, SetInfoResDto)
+    async setInfo(@Body() body: SetInfoReqDto, @TokenPlyload('id') id: number) {
+        return await this.authService.setInfo(id, body)
     }
 }

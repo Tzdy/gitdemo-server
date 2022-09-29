@@ -53,7 +53,6 @@ export class AuthServiceImpl implements AuthService {
                 id,
             },
         })
-        console.log(user?.created_time)
         if (!user) {
             throw new HttpAuthException(20001, '用户不存在')
         }
@@ -93,14 +92,10 @@ export class AuthServiceImpl implements AuthService {
         info: SetInfoReqDto
     ): Promise<SetInfoResDto> {
         const setInfoResDto = new SetInfoResDto()
-        const keys: (keyof SetInfoReqDto)[] = [
-            'nickname',
-            'avatar',
-            'bio',
-            'address',
-            'link',
-            'twitter',
-        ]
+        const keys = Object.keys(info)
+        if (keys.length === 0) {
+            throw new HttpOKException(20001, '请输入需要修改的值')
+        }
         const updateVal: Partial<User> = {}
         keys.forEach((key) => {
             if (Reflect.has(info, key)) {
@@ -117,21 +112,13 @@ export class AuthServiceImpl implements AuthService {
             )
         } catch (err: any) {
             if (err.code === 'ER_DUP_ENTRY') {
-                throw new HttpOKException(20001, '名称nickname已存在')
+                throw new HttpOKException(20002, '名称nickname已存在')
             } else {
                 throw new HttpException(500, err.message)
             }
         }
         setInfoResDto.message = '修改成功'
         return setInfoResDto
-    }
-
-    async findUserByUsername(username: string): Promise<User | null> {
-        return await model.manager.findOne(User, {
-            where: {
-                username,
-            },
-        })
     }
 
     private async createUserRootDir(username: string) {
