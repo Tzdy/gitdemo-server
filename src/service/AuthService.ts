@@ -1,10 +1,7 @@
-import {
-    InfoResDto,
-    LoginResDto,
-    RegisterResDto,
-    SetInfoReqDto,
-    SetInfoResDto,
-} from '@/dto/auth.dto'
+import { InfoResDto } from '@/dto/auth/getInfoDto'
+import { LoginResDto } from '@/dto/auth/loginDto'
+import { RegisterResDto } from '@/dto/auth/registryDto'
+import { SetInfoReqDto, SetInfoResDto } from '@/dto/auth/setInfoDto'
 import { User } from '@/entity/User'
 
 export interface AuthService {

@@ -1,11 +1,6 @@
-import {
-    InfoReqDto,
-    InfoResDto,
-    LoginReqDto,
-    LoginResDto,
-    RegisterReqDto,
-    RegisterResDto,
-} from '@/dto/auth.dto'
+import { InfoResDto, InfoReqDto } from '@/dto/auth/getInfoDto'
+import { LoginResDto, LoginReqDto } from '@/dto/auth/loginDto'
+import { RegisterResDto, RegisterReqDto } from '@/dto/auth/registryDto'
 import { TokenMiddleWare } from '@/middleware/token'
 import { AuthServiceImpl } from '@/service/impl/AuthServiceImpl'
 import {

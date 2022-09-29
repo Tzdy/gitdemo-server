@@ -1,4 +1,4 @@
-import { CreateRepoReqDto, CreateRepoResDto } from '@/dto/RepoDto'
+import { CreateRepoResDto, CreateRepoReqDto } from '@/dto/repo/createRepoDto'
 import { TokenMiddleWare } from '@/middleware/token'
 import { RepoServiceImpl } from '@/service/impl/RepoServiceImpl'
 import {

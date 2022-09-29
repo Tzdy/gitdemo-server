@@ -1,10 +1,3 @@
-import {
-    InfoResDto,
-    LoginResDto,
-    RegisterResDto,
-    SetInfoReqDto,
-    SetInfoResDto,
-} from '@/dto/auth.dto'
 import { User } from '@/entity/User'
 import { model } from '@/model'
 import { sign } from '@/utils/jwt'
@@ -13,6 +6,10 @@ import { HttpAuthException, HttpOKException } from '@/utils/exception'
 import { HttpException } from '@tsdy/express-plugin-exception'
 import { mkdir } from 'fs/promises'
 import { join } from 'path'
+import { InfoResDto } from '@/dto/auth/getInfoDto'
+import { LoginResDto } from '@/dto/auth/loginDto'
+import { RegisterResDto } from '@/dto/auth/registryDto'
+import { SetInfoReqDto, SetInfoResDto } from '@/dto/auth/setInfoDto'
 
 export class AuthServiceImpl implements AuthService {
     public async login(

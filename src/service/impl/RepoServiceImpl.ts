@@ -1,4 +1,4 @@
-import { CreateRepoReqDto, CreateRepoResDto } from '@/dto/RepoDto'
+import { CreateRepoReqDto, CreateRepoResDto } from '@/dto/repo/createRepoDto'
 import { Repo } from '@/entity/Repo'
 import { User } from '@/entity/User'
 import { model } from '@/model'
