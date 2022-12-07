@@ -48,6 +48,8 @@ export class AuthServiceImpl implements AuthService {
                 'created_time',
                 'link',
                 'twitter',
+                'repo_total_num',
+                'star_total_num',
             ],
             where: {
                 id,

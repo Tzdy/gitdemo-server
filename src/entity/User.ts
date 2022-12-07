@@ -51,4 +51,12 @@ export class User {
         default: '',
     })
     twitter: string
+
+    // 仓库总数
+    @Column()
+    repo_total_num: number
+
+    // star总数
+    @Column()
+    star_total_num: number
 }

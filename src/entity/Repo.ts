@@ -55,6 +55,7 @@ export class Repo {
     })
     website: string
 
+    // 提交时间，不是commit time
     @Column({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP',

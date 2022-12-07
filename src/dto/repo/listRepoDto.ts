@@ -2,8 +2,9 @@ import { Repo, RepoType } from '@/entity/Repo'
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 
 export enum ListRepoSortType {
-    REPO_NAME = 0,
-    STAR = 1,
+    LAST_UPDATE = 0,
+    NAME = 1,
+    STAR = 2,
 }
 
 export class ListRepoReqDto {
@@ -47,14 +48,56 @@ export class RepoDto {
     id: number
 
     @ApiProperty({
-        type: 'string',
+        type: 'number',
     })
-    name: string
+    user_id: number
 
     @ApiProperty({
         type: 'number',
     })
     type: RepoType
+
+    @ApiProperty({
+        type: 'string',
+    })
+    repo_name: string
+
+    @ApiProperty({
+        type: 'string',
+    })
+    create_time: Date
+
+    @ApiProperty({
+        type: 'number',
+    })
+    stars_num: number
+
+    @ApiProperty({
+        type: 'boolean',
+    })
+    is_overview: boolean
+
+    @ApiProperty({
+        type: 'string',
+    })
+    about: string
+
+    @ApiProperty({
+        type: 'string',
+    })
+    website: string
+
+    // 提交时间，不是commit time
+    @ApiProperty({
+        type: 'string',
+    })
+    update_time: Date
+
+    // 创建仓库时为空
+    @ApiProperty({
+        type: 'string',
+    })
+    language: string
 }
 
 class ListRepoResData {
