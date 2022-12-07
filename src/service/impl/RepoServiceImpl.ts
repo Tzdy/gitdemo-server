@@ -18,6 +18,7 @@ export class RepoServiceImpl implements RepoService {
                 repo_name: dto.repoName,
                 type: dto.type,
                 user_id: userId,
+                language_analysis: [],
             })
         } catch (err: any) {
             if (err.code === 'ER_DUP_ENTRY') {

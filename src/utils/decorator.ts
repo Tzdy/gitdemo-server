@@ -2,7 +2,7 @@ import { asyncException } from '@tsdy/express-plugin-exception'
 import { ExpressSwagger } from '@tsdy/express-plugin-swagger'
 import { validatorMiddleWare } from '@tsdy/express-plugin-validator'
 import { NextFunction, Request, Response, Router } from 'express'
-
+import multer from 'multer'
 type MethodType = 'get' | 'post' | 'delete' | 'put' | 'all'
 
 interface RouteOptions {
@@ -125,12 +125,20 @@ export function UseGuards(
     }
 }
 
+function addMiddleware(
+    target: any,
+    propKey: string,
+    middleware: (req: Request, res: Response, next: NextFunction) => void
+) {
+    const options = getRouterOptions(target)
+    options.routes[propKey].middleware.push(middleware)
+}
+
 export function Middleware(
     middleware: (req: Request, res: Response, next: NextFunction) => void
 ) {
     return function (target: any, propKey: string, decorator: any) {
-        const options = getRouterOptions(target)
-        options.routes[propKey].middleware.push(middleware)
+        addMiddleware(target, propKey, middleware)
     }
 }
 
@@ -256,6 +264,41 @@ export function TokenPlyload(key?: string) {
             } else {
                 return req.user
             }
+        }
+    }
+}
+export interface MulterOptions extends Omit<multer.Options, 'storage'> {
+    /** @override */
+    storage?: multer.DiskStorageOptions
+    fields?: multer.Field[]
+}
+export function Upload(options: MulterOptions) {
+    return function (
+        target: any,
+        propKey: string,
+        descriptor: TypedPropertyDescriptor<(...argvs: any[]) => Promise<any>>
+    ) {
+        const { storage: storageOptions, fields, ...op } = options
+        const multerOptions: multer.Options = {
+            ...op,
+            storage: storageOptions
+                ? multer.diskStorage(storageOptions)
+                : undefined,
+        }
+        const upload = multer(multerOptions)
+        // 如果fields不存在，则拒绝所有文件，但是不会拒绝formdata中的文本
+        const uploadMiddleware = fields ? upload.fields(fields) : upload.none()
+        addMiddleware(target, propKey, uploadMiddleware)
+    }
+}
+
+export function Files() {
+    return function (target: any, propKey: string, parameterIndex: number) {
+        const options = getRouterOptions(target)
+        options.routes[propKey].parameter[parameterIndex] = function (
+            req: Request
+        ) {
+            return req.files
         }
     }
 }

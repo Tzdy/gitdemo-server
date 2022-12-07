@@ -12,6 +12,7 @@ declare global {
             MYSQL_PASSWORD: string
             MYSQL_DATABASE: string
             JWT_SECRET: string
+            UPLOAD_INFO_AVATAR: string
             GIT_ROOT_PATH: string
         }
     }

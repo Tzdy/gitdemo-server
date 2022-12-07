@@ -10,10 +10,14 @@ import {
     ApiTag,
     Body,
     Controller,
+    Files,
     Post,
     TokenPlyload,
+    Upload,
     UseGuards,
 } from '@/utils/decorator'
+import { DiskStorageOptions, Multer } from 'multer'
+import { resolve } from 'path'
 
 @ApiTag('Auth')
 @Controller('auth')
@@ -46,5 +50,23 @@ export class AuthRouter {
     @ApiResponse(200, SetInfoResDto)
     async setInfo(@Body() body: SetInfoReqDto, @TokenPlyload('id') id: number) {
         return await this.authService.setInfo(id, body)
+    }
+
+    @Post('upload_info_avatar')
+    @Upload({
+        storage: {
+            destination(req, file, cb) {
+                const dir = resolve(process.env.UPLOAD_INFO_AVATAR)
+                cb(null, dir)
+            },
+            filename(req, file, cb) {
+                // file.filename 传送方可能没起名字。。。
+                cb(null, file.originalname)
+            },
+        },
+        fields: [{ name: 'avatar' }],
+    })
+    async uploadAvatar(@Files() files: Express.Multer.File[]) {
+        return {}
     }
 }

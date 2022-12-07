@@ -5,6 +5,11 @@ export enum RepoType {
     PRIVATE = 1,
 }
 
+export type LanguageAnalysisItem = {
+    language_id: number
+    file_num: number
+}
+
 @Entity('repo')
 @Index(['user_id', 'repo_name'], { unique: true })
 export class Repo {
@@ -49,4 +54,21 @@ export class Repo {
         default: '',
     })
     website: string
+
+    @Column({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP',
+    })
+    update_time: Date
+
+    // 创建仓库时为空
+    @Column({
+        default: '',
+    })
+    language: string
+
+    @Column({
+        type: 'json',
+    })
+    language_analysis: LanguageAnalysisItem[]
 }
