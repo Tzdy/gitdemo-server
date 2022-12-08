@@ -4,6 +4,14 @@ import {
     ListRepoLanguageReqDto,
     ListRepoLanguageResDto,
 } from '@/dto/repo/listRepoLanguageDto'
+import { Item } from '@/entity/Item'
+
+interface TreeCommitItem extends Item {
+    commitHash: string
+    committerName: string
+    commitTime: Date
+    commitBody: string
+}
 
 export interface RepoService {
     createRepo(userId: number, dto: CreateRepoReqDto): Promise<CreateRepoResDto>
@@ -15,4 +23,11 @@ export interface RepoService {
         userId: number,
         dto: ListRepoLanguageReqDto
     ): Promise<ListRepoLanguageResDto>
+
+    // 获取带commit信息的tree列表
+    listRepoFile(
+        userId: number,
+        repoName: string,
+        path: string
+    ): Promise<TreeCommitItem[]>
 }
