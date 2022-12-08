@@ -15,16 +15,5 @@ export class Item {
     commit_hash: string
 
     @Column()
-    committer_name: string
-
-    @Column({
-        type: 'timestamp',
-    })
-    commit_time: Date
-
-    @Column()
-    commit_body: string
-
-    @Column()
     hash: string
 }

@@ -40,7 +40,7 @@ export class GitServiceImpl implements GitService {
         if (allBranchList.length === 1 && /0{36}/.test(last)) {
             await gitUtil.updateHead(branchName)
         }
-        const allCommitList = await gitUtil.findCommit(branchName)
+        const allCommitList = await gitUtil.findAllCommitHash(branchName)
         const commitHashList = (
             await model.manager.find(Commit, {
                 select: ['commit_hash'],
@@ -53,27 +53,23 @@ export class GitServiceImpl implements GitService {
         const set = new Set()
         commitHashList.forEach((commitHash) => set.add(commitHash))
         const diffCommitList = allCommitList.filter(
-            (commit) => !set.has(commit.commitHash)
+            (commitHash) => !set.has(commitHash)
         )
-        const commitArr = diffCommitList.map((commit) => {
+        const commitArr = diffCommitList.map((commitHash) => {
             const commitEntity = new Commit()
-            commitEntity.commit_hash = commit.commitHash
+            commitEntity.commit_hash = commitHash
             commitEntity.repo_id = repo.id
             commitEntity.user_id = user.id
             return commitEntity
         })
         await model.manager.insert(Commit, commitArr)
         const itemList = await gitUtil.findDiffItem(
-            diffCommitList.map((commit) => commit.commitHash)
+            diffCommitList.map((commitHash) => commitHash)
         )
         await model.manager.insert(
             Item,
             itemList.map((item) => {
                 const itemEntity = new Item()
-                itemEntity.commit_body = item.comment
-                itemEntity.commit_hash = item.commitHash
-                itemEntity.commit_time = item.time
-                itemEntity.committer_name = item.username
                 itemEntity.hash = item.hash
                 itemEntity.repo_id = repo.id
                 itemEntity.user_id = user.id
