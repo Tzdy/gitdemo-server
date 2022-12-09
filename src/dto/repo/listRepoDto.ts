@@ -9,6 +9,11 @@ export enum ListRepoSortType {
 
 export class ListRepoReqDto {
     @ApiProperty({
+        type: 'string',
+    })
+    username: string
+
+    @ApiProperty({
         type: 'number',
     })
     page: number

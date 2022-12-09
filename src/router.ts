@@ -4,8 +4,8 @@ import { GitRouter } from './router/GitRouter'
 import { RepoRouter } from './router/RepoRouter'
 import { applyRouter } from './utils/decorator'
 
-const router = Router()
+export const router = Router()
+export const gitRouter = Router()
+applyRouter(router, [AuthRouter, RepoRouter])
 
-applyRouter(router, [AuthRouter, GitRouter, RepoRouter])
-
-export default router
+applyRouter(gitRouter, [GitRouter])

@@ -70,6 +70,7 @@ export class GitServiceImpl implements GitService {
             Item,
             itemList.map((item) => {
                 const itemEntity = new Item()
+                itemEntity.commit_hash = item.commitHash
                 itemEntity.hash = item.hash
                 itemEntity.repo_id = repo.id
                 itemEntity.user_id = user.id
