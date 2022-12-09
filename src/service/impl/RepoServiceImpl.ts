@@ -17,6 +17,7 @@ import {
 } from '@/dto/repo/listRepoFileDto'
 import { Item } from '@/entity/Item'
 import { Commit } from '@tsdy/git-util/src/git.interface'
+import { parseLanguageId } from '@tsdy/git-util'
 
 export class RepoServiceImpl implements RepoService {
     private async findUser(myselfId: number, username: string) {
@@ -44,7 +45,7 @@ export class RepoServiceImpl implements RepoService {
                 repo_name: dto.repoName,
                 type: dto.type,
                 user_id: userId,
-                language_analysis: [],
+                about: dto.about,
             })
         } catch (err: any) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -87,9 +88,8 @@ export class RepoServiceImpl implements RepoService {
         if (!isMyself) {
             where.type = RepoType.PUBLIC
         }
-        console.log(dto)
         dto.repoType ? (where.type = dto.repoType) : null
-        dto.language ? (where.language = dto.language) : null
+        dto.languageId ? (where.language_id = dto.languageId) : null
         dto.keyword ? (where.repo_name = Like(`${dto.keyword}%`)) : null
         const order: FindOptionsOrder<Repo> = {}
         switch (dto.sort) {
@@ -104,6 +104,17 @@ export class RepoServiceImpl implements RepoService {
                 break
         }
         const list = await model.manager.find(Repo, {
+            select: [
+                'about',
+                'create_time',
+                'id',
+                'is_overview',
+                'language_id',
+                'repo_name',
+                'stars_num',
+                'type',
+                'update_time',
+            ],
             where,
             order,
             skip: (dto.page - 1) * dto.pageSize,
@@ -112,7 +123,19 @@ export class RepoServiceImpl implements RepoService {
 
         const resDto = new ListRepoResDto()
         resDto.data = {
-            repoList: list,
+            repoList: list.map((item) => {
+                const { language_id, ...it } = item
+                let language = ''
+                if (Number.isInteger(language_id)) {
+                    language = parseLanguageId(language_id)
+                        ? parseLanguageId(language_id).name
+                        : 'other'
+                }
+                return {
+                    language,
+                    ...it,
+                }
+            }),
         }
         return resDto
     }

@@ -36,9 +36,9 @@ export class ListRepoReqDto {
     sort?: ListRepoSortType
 
     @ApiProperty({
-        type: 'string',
+        type: 'number',
     })
-    language?: string
+    languageId?: number
 
     @ApiProperty({
         type: 'string',
@@ -51,11 +51,6 @@ export class RepoDto {
         type: 'number',
     })
     id: number
-
-    @ApiProperty({
-        type: 'number',
-    })
-    user_id: number
 
     @ApiProperty({
         type: 'number',
@@ -86,11 +81,6 @@ export class RepoDto {
         type: 'string',
     })
     about: string
-
-    @ApiProperty({
-        type: 'string',
-    })
-    website: string
 
     // 提交时间，不是commit time
     @ApiProperty({

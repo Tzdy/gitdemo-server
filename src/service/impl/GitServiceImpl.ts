@@ -77,5 +77,29 @@ export class GitServiceImpl implements GitService {
                 return itemEntity
             })
         )
+
+        const languageList = repo.language_analysis
+        itemList.forEach((item) => {
+            const langItem = languageList.find(
+                (lang) => lang.language_id === item.langId
+            )
+            if (langItem) {
+                langItem.file_num += 1
+            } else {
+                languageList.push({
+                    language_id: item.langId,
+                    file_num: 1,
+                })
+            }
+        })
+        languageList.sort((a, b) => b.file_num - a.file_num)
+        await model.manager.update(
+            Repo,
+            { id: repo.id },
+            {
+                language_id: languageList[0].language_id,
+                language_analysis: languageList,
+            }
+        )
     }
 }

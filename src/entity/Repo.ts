@@ -64,12 +64,13 @@ export class Repo {
 
     // 创建仓库时为空
     @Column({
-        default: '',
+        default: null,
     })
-    language: string
+    language_id: number
 
     @Column({
         type: 'json',
+        default: () => '(JSON_ARRAY())',
     })
     language_analysis: LanguageAnalysisItem[]
 }
