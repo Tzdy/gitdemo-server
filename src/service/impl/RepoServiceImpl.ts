@@ -18,8 +18,13 @@ import {
 import { Item } from '@/entity/Item'
 import { Commit } from '@tsdy/git-util/src/git.interface'
 import { parseLanguageId } from '@tsdy/git-util'
+import {
+    ListAllRepoLanguageReqDto,
+    ListAllRepoLanguageResDto,
+} from '@/dto/repo/listAllRepoLanguageDto'
 
 export class RepoServiceImpl implements RepoService {
+    // 获取的是username对应的user
     private async findUser(myselfId: number, username: string) {
         const user = await model.manager.findOne(User, {
             where: {
@@ -84,13 +89,14 @@ export class RepoServiceImpl implements RepoService {
     ): Promise<ListRepoResDto> {
         const { isMyself } = await this.findUser(userId, dto.username)
         const where: FindOptionsWhere<Repo> = {}
+        dto.repoType ? (where.type = dto.repoType) : null
         // 如果不是自己，不能看私有仓库
-        if (!isMyself) {
+        if (!isMyself && where.type === RepoType.PRIVATE) {
             where.type = RepoType.PUBLIC
         }
-        dto.repoType ? (where.type = dto.repoType) : null
         dto.languageId ? (where.language_id = dto.languageId) : null
         dto.keyword ? (where.repo_name = Like(`${dto.keyword}%`)) : null
+        dto.isOverview ? (where.is_overview = dto.isOverview) : null
         const order: FindOptionsOrder<Repo> = {}
         switch (dto.sort) {
             case ListRepoSortType.LAST_UPDATE:
@@ -120,16 +126,16 @@ export class RepoServiceImpl implements RepoService {
             skip: (dto.page - 1) * dto.pageSize,
             take: dto.pageSize,
         })
-
         const resDto = new ListRepoResDto()
         resDto.data = {
             repoList: list.map((item) => {
                 const { language_id, ...it } = item
                 let language = ''
                 if (Number.isInteger(language_id)) {
+                    // 主语言id为-1的，不展示内容。
                     language = parseLanguageId(language_id)
                         ? parseLanguageId(language_id).name
-                        : 'other'
+                        : ''
                 }
                 return {
                     language,
@@ -188,5 +194,32 @@ export class RepoServiceImpl implements RepoService {
             }),
         }
         return resDto
+    }
+
+    public async listAllRepoLanguage(
+        userId: number,
+        dto: ListAllRepoLanguageReqDto
+    ): Promise<ListAllRepoLanguageResDto> {
+        const { isMyself, user } = await this.findUser(userId, dto.username)
+        const where: FindOptionsWhere<Repo> = {}
+        where.user_id = user.id
+        if (!isMyself) {
+            where.type = RepoType.PUBLIC
+        }
+        const list = await model.manager.find(Repo, {
+            select: ['language_id'],
+            where,
+        })
+        const resData = new ListAllRepoLanguageResDto()
+        resData.data = {
+            languageList: list
+                .map((item) =>
+                    parseLanguageId(item.language_id)
+                        ? parseLanguageId(item.language_id).name
+                        : ''
+                )
+                .filter((item) => item),
+        }
+        return resData
     }
 }

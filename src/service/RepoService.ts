@@ -6,20 +6,23 @@ import {
     TreeCommitItem,
 } from '@/dto/repo/listRepoFileDto'
 import {
-    ListRepoLanguageReqDto,
-    ListRepoLanguageResDto,
-} from '@/dto/repo/listRepoLanguageDto'
+    ListAllRepoLanguageReqDto,
+    ListAllRepoLanguageResDto,
+} from '@/dto/repo/listAllRepoLanguageDto'
+import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 
 export interface RepoService {
     createRepo(userId: number, dto: CreateRepoReqDto): Promise<CreateRepoResDto>
 
+    updateRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto>
+
     listRepo(userId: number, dto: ListRepoReqDto): Promise<ListRepoResDto>
 
     // 获取该用户所有仓库的语言列表
-    listRepoLanguage(
+    listAllRepoLanguage(
         userId: number,
-        dto: ListRepoLanguageReqDto
-    ): Promise<ListRepoLanguageResDto>
+        dto: ListAllRepoLanguageReqDto
+    ): Promise<ListAllRepoLanguageResDto>
 
     // 获取带commit信息的tree列表
     listRepoFile(

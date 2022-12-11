@@ -1,15 +1,10 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 
-export class ListRepoLanguageReqDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    userId: number
-
+export class ListAllRepoLanguageReqDto {
     @ApiProperty({
         type: 'string',
     })
-    repoName: string
+    username: string
 }
 
 class ResData {
@@ -22,12 +17,7 @@ class ResData {
     languageList: Array<string>
 }
 
-export class ListRepoLanguageResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    userId: number
-
+export class ListAllRepoLanguageResDto {
     @ApiProperty({
         type: 'object',
         ref: ResData,

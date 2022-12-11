@@ -1,4 +1,8 @@
 import { CreateRepoResDto, CreateRepoReqDto } from '@/dto/repo/createRepoDto'
+import {
+    ListAllRepoLanguageReqDto,
+    ListAllRepoLanguageResDto,
+} from '@/dto/repo/listAllRepoLanguageDto'
 import { ListRepoReqDto, ListRepoResDto } from '@/dto/repo/listRepoDto'
 import {
     ListRepoFileReqDto,
@@ -42,6 +46,17 @@ export class RepoRouter {
         @TokenPlyload('id') id: number
     ) {
         return this.repoService.listRepo(id, dto)
+    }
+
+    @Post('/list_all_repo_language')
+    @ApiResponse(200, ListAllRepoLanguageResDto)
+    @UseGuards(TokenMiddleWare)
+    @ApiSecurity('token')
+    async listAllRepoLanguage(
+        @Body() dto: ListAllRepoLanguageReqDto,
+        @TokenPlyload('id') id: number
+    ) {
+        return this.repoService.listAllRepoLanguage(id, dto)
     }
 
     @Post('/list_repo_file')

@@ -20,8 +20,7 @@ export class Repo {
     user_id: number
 
     @Column({
-        type: 'enum',
-        enum: RepoType,
+        type: 'int',
         default: RepoType.PUBLIC,
     })
     type: RepoType

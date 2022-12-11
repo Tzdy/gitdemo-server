@@ -44,6 +44,11 @@ export class ListRepoReqDto {
         type: 'string',
     })
     keyword?: string
+
+    @ApiProperty({
+        type: 'boolean',
+    })
+    isOverview?: boolean
 }
 
 export class RepoDto {
