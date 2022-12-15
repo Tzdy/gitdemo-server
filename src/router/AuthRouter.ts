@@ -41,6 +41,7 @@ export class AuthRouter {
     @ApiSecurity('token')
     @ApiResponse(200, InfoResDto)
     async info(@Body() body: InfoReqDto, @TokenPlyload('id') id: number) {
+        console.log('info')
         return await this.authService.info(id)
     }
 

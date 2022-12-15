@@ -69,7 +69,7 @@ export class Repo {
 
     @Column({
         type: 'json',
-        default: () => '(JSON_ARRAY())',
+        // default: () => '(JSON_ARRAY())', 8.0.13前不能设置。。
     })
     language_analysis: LanguageAnalysisItem[]
 }
