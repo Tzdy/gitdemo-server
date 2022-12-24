@@ -1,3 +1,4 @@
+import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 import { CreateRepoResDto, CreateRepoReqDto } from '@/dto/repo/createRepoDto'
 import {
     ListAllRepoLanguageReqDto,
@@ -8,6 +9,7 @@ import {
     ListRepoFileReqDto,
     ListRepoFileResDto,
 } from '@/dto/repo/listRepoFileDto'
+import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 import { TokenMiddleWare } from '@/middleware/token'
 import { RepoServiceImpl } from '@/service/impl/RepoServiceImpl'
 import {
@@ -59,6 +61,14 @@ export class RepoRouter {
         return this.repoService.listAllRepoLanguage(id, dto)
     }
 
+    @Post('/set_repo')
+    @ApiResponse(200, SetRepoResDto)
+    @UseGuards(TokenMiddleWare)
+    @ApiSecurity('token')
+    async setRepo(@Body() dto: SetRepoReqDto, @TokenPlyload('id') id: number) {
+        return this.repoService.setRepo(id, dto)
+    }
+
     @Post('/list_repo_file')
     @ApiResponse(200, ListRepoFileResDto)
     @UseGuards(TokenMiddleWare)
@@ -68,5 +78,16 @@ export class RepoRouter {
         @TokenPlyload('id') id: number
     ) {
         return this.repoService.listRepoFile(id, dto)
+    }
+
+    @Post('/cat_repo_file')
+    @ApiResponse(200, CatRepoFileResDto)
+    @UseGuards(TokenMiddleWare)
+    @ApiSecurity('token')
+    async catRepoFile(
+        @Body() dto: CatRepoFileReqDto,
+        @TokenPlyload('id') id: number
+    ) {
+        return this.repoService.catRepoFile(id, dto)
     }
 }

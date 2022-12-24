@@ -22,6 +22,9 @@ import {
     ListAllRepoLanguageReqDto,
     ListAllRepoLanguageResDto,
 } from '@/dto/repo/listAllRepoLanguageDto'
+import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
+import { assign } from '@/utils/assign'
+import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -220,6 +223,57 @@ export class RepoServiceImpl implements RepoService {
                 )
                 .filter((item) => item),
         }
+        return resData
+    }
+
+    async setRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto> {
+        const updateVal: Partial<Repo> = {}
+        assign(updateVal, 'about', dto.about)
+        assign(updateVal, 'is_overview', dto.isOverview)
+        assign(updateVal, 'repo_name', dto.repoName)
+        assign(updateVal, 'language_id', dto.languageId)
+        assign(updateVal, 'type', dto.type)
+        assign(updateVal, 'website', dto.website)
+        await model.manager.update(
+            Repo,
+            {
+                user_id: userId,
+            },
+            updateVal
+        )
+        const resData = new SetRepoResDto()
+        return resData
+    }
+
+    async catRepoFile(
+        userId: number,
+        dto: CatRepoFileReqDto
+    ): Promise<CatRepoFileResDto> {
+        const { isMyself, user } = await this.findUser(userId, dto.username)
+        // 目标用户的仓库信息
+        const repo = await model.manager.findOne(Repo, {
+            where: {
+                user_id: user.id,
+                repo_name: dto.repoName,
+            },
+        })
+        if (!repo) {
+            throw new HttpOKException(20001, '仓库不存在')
+        }
+        if (!isMyself) {
+            if (repo.type === RepoType.PRIVATE) {
+                throw new HttpOKException(20002, '没有权限查看该仓库')
+            }
+        }
+        const gitUtil = createGitUtil(dto.username, dto.repoName)
+        const { size, value } = await gitUtil.findBlob(dto.branch, dto.path)
+        console.log(dto.branch, dto.path)
+        const resData = new CatRepoFileResDto()
+        resData.data = {
+            size,
+            value,
+        }
+
         return resData
     }
 }

@@ -10,11 +10,12 @@ import {
     ListAllRepoLanguageResDto,
 } from '@/dto/repo/listAllRepoLanguageDto'
 import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
+import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 
 export interface RepoService {
     createRepo(userId: number, dto: CreateRepoReqDto): Promise<CreateRepoResDto>
 
-    updateRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto>
+    setRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto>
 
     listRepo(userId: number, dto: ListRepoReqDto): Promise<ListRepoResDto>
 
@@ -29,4 +30,9 @@ export interface RepoService {
         userId: number,
         dto: ListRepoFileReqDto
     ): Promise<ListRepoFileResDto>
+
+    catRepoFile(
+        userId: number,
+        dto: CatRepoFileReqDto
+    ): Promise<CatRepoFileResDto>
 }
