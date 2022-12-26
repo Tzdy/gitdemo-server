@@ -2,6 +2,13 @@ import { ApiProperty } from '@tsdy/express-plugin-swagger'
 
 export class InfoReqDto {}
 
+export class OtherInfoReqDto {
+    @ApiProperty({
+        type: 'string',
+    })
+    username: string
+}
+
 export class InfoDto {
     @ApiProperty({
         type: 'integer',

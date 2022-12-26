@@ -6,10 +6,12 @@ import { HttpAuthException, HttpOKException } from '@/utils/exception'
 import { HttpException } from '@tsdy/express-plugin-exception'
 import { mkdir } from 'fs/promises'
 import { join } from 'path'
-import { InfoResDto } from '@/dto/auth/getInfoDto'
+import { InfoReqDto, InfoResDto, OtherInfoReqDto } from '@/dto/auth/getInfoDto'
 import { LoginResDto } from '@/dto/auth/loginDto'
 import { RegisterResDto } from '@/dto/auth/registryDto'
 import { SetInfoReqDto, SetInfoResDto } from '@/dto/auth/setInfoDto'
+import { FindOptionsWhere } from 'typeorm'
+import { assign } from '@/utils/assign'
 
 export class AuthServiceImpl implements AuthService {
     public async login(
@@ -35,8 +37,10 @@ export class AuthServiceImpl implements AuthService {
         return loginResDto
     }
 
-    public async info(id: number): Promise<InfoResDto> {
+    public async otherInfo(dto: OtherInfoReqDto): Promise<InfoResDto> {
         const infoResDto = new InfoResDto()
+        const where: FindOptionsWhere<User> = {}
+        assign(where, 'username', dto.username)
         const user = await model.manager.findOne(User, {
             select: [
                 'username',
@@ -51,9 +55,37 @@ export class AuthServiceImpl implements AuthService {
                 'repo_total_num',
                 'star_total_num',
             ],
-            where: {
-                id,
-            },
+            where,
+        })
+        if (!user) {
+            throw new HttpAuthException(20001, '用户不存在')
+        }
+        infoResDto.data = {
+            info: user,
+        }
+        return infoResDto
+    }
+
+    public async info(id: number): Promise<InfoResDto> {
+        const infoResDto = new InfoResDto()
+        const where: FindOptionsWhere<User> = {}
+        // 有username，就查询username，没有才根据id查
+        assign(where, 'id', id)
+        const user = await model.manager.findOne(User, {
+            select: [
+                'username',
+                'id',
+                'nickname',
+                'address',
+                'avatar',
+                'bio',
+                'created_time',
+                'link',
+                'twitter',
+                'repo_total_num',
+                'star_total_num',
+            ],
+            where,
         })
         if (!user) {
             throw new HttpAuthException(20001, '用户不存在')

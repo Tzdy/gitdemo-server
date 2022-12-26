@@ -146,7 +146,7 @@ export function Controller(base: string | undefined = '') {
     return function <T extends { new (...argvs: any[]): {} }>(Ctor: T) {
         const options = getRouterOptions(Ctor)
         options.base = base
-        const parameter = Reflect.getMetadata('design:paramtypes', Ctor)
+        const parameter = Reflect.getMetadata('design:paramtypes', Ctor) || []
         class C extends Ctor {
             constructor(...argvs: any[]) {
                 super(
@@ -180,6 +180,10 @@ export function Post(path: string) {
     return execRouter('post', path)
 }
 
+export function Get(path: string) {
+    return execRouter('get', path)
+}
+
 export function RequestMapper(path: string) {
     return execRouter('all', path)
 }
@@ -200,6 +204,30 @@ export function Body() {
             req: Request
         ) {
             return req.body
+        }
+    }
+}
+
+export function Query(name?: string) {
+    return function (target: any, propKey: string, parameterIndex: number) {
+        const options = getRouterOptions(target)
+        const parameter = Reflect.getMetadata(
+            'design:paramtypes',
+            target,
+            propKey
+        )
+        options.routes[propKey].swagger.parameter = {
+            in: 'query',
+            dto: parameter[parameterIndex],
+        }
+        options.routes[propKey].parameter[parameterIndex] = function (
+            req: Request
+        ) {
+            if (name) {
+                return req.query[name]
+            } else {
+                return req.query
+            }
         }
     }
 }

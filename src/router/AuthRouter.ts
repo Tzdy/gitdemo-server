@@ -1,4 +1,4 @@
-import { InfoResDto, InfoReqDto } from '@/dto/auth/getInfoDto'
+import { InfoResDto, InfoReqDto, OtherInfoReqDto } from '@/dto/auth/getInfoDto'
 import { LoginResDto, LoginReqDto } from '@/dto/auth/loginDto'
 import { RegisterResDto, RegisterReqDto } from '@/dto/auth/registryDto'
 import { SetInfoReqDto, SetInfoResDto } from '@/dto/auth/setInfoDto'
@@ -40,9 +40,15 @@ export class AuthRouter {
     @UseGuards(TokenMiddleWare)
     @ApiSecurity('token')
     @ApiResponse(200, InfoResDto)
-    async info(@Body() body: InfoReqDto, @TokenPlyload('id') id: number) {
+    async info(@TokenPlyload('id') id: number) {
         console.log('info')
         return await this.authService.info(id)
+    }
+
+    @Post('other_info')
+    @ApiResponse(200, InfoResDto)
+    async otherInfo(@Body() body: OtherInfoReqDto) {
+        return await this.authService.otherInfo(body)
     }
 
     @Post('set_info')
@@ -54,6 +60,8 @@ export class AuthRouter {
     }
 
     @Post('upload_info_avatar')
+    @UseGuards(TokenMiddleWare)
+    @ApiSecurity('token')
     @Upload({
         storage: {
             destination(req, file, cb) {
@@ -62,7 +70,7 @@ export class AuthRouter {
             },
             filename(req, file, cb) {
                 // file.filename 传送方可能没起名字。。。
-                cb(null, file.originalname)
+                cb(null, req.user.id + '')
             },
         },
         fields: [{ name: 'avatar' }],
