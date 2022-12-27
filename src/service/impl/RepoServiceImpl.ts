@@ -9,7 +9,7 @@ import { User } from '@/entity/User'
 import { model } from '@/model'
 import { HttpAuthException, HttpOKException } from '@/utils/exception'
 import { RepoService } from '@/service/RepoService'
-import { FindOptionsOrder, FindOptionsWhere, In, Like } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, In, Like, Not } from 'typeorm'
 import { createGitUtil } from '@/utils/git'
 import {
     ListRepoFileReqDto,
@@ -99,7 +99,7 @@ export class RepoServiceImpl implements RepoService {
         }
         dto.languageId ? (where.language_id = dto.languageId) : null
         dto.keyword ? (where.repo_name = Like(`${dto.keyword}%`)) : null
-        dto.isOverview ? (where.is_overview = dto.isOverview) : null
+        dto.isOverview ? (where.is_overview = Not(0)) : null
         const order: FindOptionsOrder<Repo> = {}
         switch (dto.sort) {
             case ListRepoSortType.LAST_UPDATE:
@@ -109,7 +109,7 @@ export class RepoServiceImpl implements RepoService {
                 order.repo_name = 'ASC'
                 break
             case ListRepoSortType.STAR:
-                order.stars_num = 'DESC'
+                order.star_num = 'DESC'
                 break
         }
         const list = await model.manager.find(Repo, {
@@ -120,7 +120,7 @@ export class RepoServiceImpl implements RepoService {
                 'is_overview',
                 'language_id',
                 'repo_name',
-                'stars_num',
+                'star_num',
                 'type',
                 'update_time',
             ],
@@ -229,7 +229,6 @@ export class RepoServiceImpl implements RepoService {
     async setRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto> {
         const updateVal: Partial<Repo> = {}
         assign(updateVal, 'about', dto.about)
-        assign(updateVal, 'is_overview', dto.isOverview)
         assign(updateVal, 'repo_name', dto.repoName)
         assign(updateVal, 'language_id', dto.languageId)
         assign(updateVal, 'type', dto.type)

@@ -75,12 +75,12 @@ export class RepoDto {
     @ApiProperty({
         type: 'number',
     })
-    stars_num: number
+    star_num: number
 
     @ApiProperty({
-        type: 'boolean',
+        type: 'integer',
     })
-    is_overview: boolean
+    is_overview: number
 
     @ApiProperty({
         type: 'string',

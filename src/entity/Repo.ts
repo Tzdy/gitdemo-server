@@ -37,12 +37,13 @@ export class Repo {
     @Column({
         default: 0,
     })
-    stars_num: number
+    star_num: number
 
+    // 1-6表示展示顺序。0表示非展示仓库
     @Column({
-        default: false,
+        default: 0,
     })
-    is_overview: boolean
+    is_overview: number
 
     @Column({
         default: '',

@@ -18,11 +18,6 @@ export class SetRepoReqDto {
     about?: string
 
     @ApiProperty({
-        type: 'boolean',
-    })
-    isOverview?: boolean
-
-    @ApiProperty({
         type: 'string',
     })
     website?: string

@@ -4,10 +4,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "pnpm tsup src/index.ts --env.NODE_ENV development --watch -d dist/dev --onSuccess 'node dist/dev/index.js'",
-        "build": "pnpx tsup src/index.ts --env.NODE_ENV production -d dist/prod",
-        "build:dev": "pnpx tsup src/index.ts --env.NODE_ENV development -d dist/prod",
-        "test": "pnpx jest"
+        "dev": "tsup src/index.ts --env.NODE_ENV development --watch -d dist/dev --onSuccess 'node dist/dev/index.js'",
+        "build": "tsup src/index.ts --env.NODE_ENV production -d dist/prod",
+        "build:dev": "tsup src/index.ts --env.NODE_ENV development -d dist/prod",
+        "test": "jest"
     },
     "keywords": [],
     "author": "",
