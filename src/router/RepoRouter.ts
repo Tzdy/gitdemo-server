@@ -10,7 +10,7 @@ import {
     ListRepoFileResDto,
 } from '@/dto/repo/listRepoFileDto'
 import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
-import { TokenMiddleWare } from '@/middleware/token'
+import { AvailableTokenMiddleWare, TokenMiddleWare } from '@/middleware/token'
 import { RepoServiceImpl } from '@/service/impl/RepoServiceImpl'
 import {
     ApiResponse,
@@ -41,13 +41,13 @@ export class RepoRouter {
 
     @Post('/list_repo')
     @ApiResponse(200, ListRepoResDto)
-    @UseGuards(TokenMiddleWare)
+    @UseGuards(AvailableTokenMiddleWare)
     @ApiSecurity('token')
     async listRepo(
         @Body() dto: ListRepoReqDto,
-        @TokenPlyload('id') id: number
+        @TokenPlyload('id') id?: number
     ) {
-        return this.repoService.listRepo(id, dto)
+        return this.repoService.listRepo(dto, id)
     }
 
     @Post('/list_all_repo_language')

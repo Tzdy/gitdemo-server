@@ -30,3 +30,6 @@ coverage
 # git root
 git-root
 upload
+
+# out
+dtoTypeOut

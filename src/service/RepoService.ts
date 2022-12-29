@@ -17,7 +17,7 @@ export interface RepoService {
 
     setRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto>
 
-    listRepo(userId: number, dto: ListRepoReqDto): Promise<ListRepoResDto>
+    listRepo(dto: ListRepoReqDto, userId?: number): Promise<ListRepoResDto>
 
     // 获取该用户所有仓库的语言列表
     listAllRepoLanguage(

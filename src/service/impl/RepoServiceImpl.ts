@@ -87,20 +87,26 @@ export class RepoServiceImpl implements RepoService {
     }
 
     async listRepo(
-        userId: number,
-        dto: ListRepoReqDto
+        dto: ListRepoReqDto,
+        userId?: number
     ): Promise<ListRepoResDto> {
-        const { isMyself } = await this.findUser(userId, dto.username)
         const where: FindOptionsWhere<Repo> = {}
-        dto.repoType ? (where.type = dto.repoType) : null
-        // 如果不是自己，不能看私有仓库
-        if (!isMyself && where.type === RepoType.PRIVATE) {
+        const order: FindOptionsOrder<Repo> = {}
+        if (typeof userId === 'number') {
+            const { isMyself } = await this.findUser(userId, dto.username)
+            dto.repoType ? (where.type = dto.repoType) : null
+            // 如果不是自己，不能看私有仓库
+            if (!isMyself && where.type === RepoType.PRIVATE) {
+                where.type = RepoType.PUBLIC
+            }
+        } else {
+            // 游客只能看公有仓库
             where.type = RepoType.PUBLIC
         }
         dto.languageId ? (where.language_id = dto.languageId) : null
         dto.keyword ? (where.repo_name = Like(`${dto.keyword}%`)) : null
         dto.isOverview ? (where.is_overview = Not(0)) : null
-        const order: FindOptionsOrder<Repo> = {}
+
         switch (dto.sort) {
             case ListRepoSortType.LAST_UPDATE:
                 order.update_time = 'DESC'
@@ -132,7 +138,7 @@ export class RepoServiceImpl implements RepoService {
         const resDto = new ListRepoResDto()
         resDto.data = {
             repoList: list.map((item) => {
-                const { language_id, ...it } = item
+                const { language_id, create_time, update_time, ...it } = item
                 let language = ''
                 if (Number.isInteger(language_id)) {
                     // 主语言id为-1的，不展示内容。
@@ -142,6 +148,8 @@ export class RepoServiceImpl implements RepoService {
                 }
                 return {
                     language,
+                    create_time: create_time.getTime(),
+                    update_time: update_time.getTime(),
                     ...it,
                 }
             }),

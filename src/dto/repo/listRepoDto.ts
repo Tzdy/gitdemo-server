@@ -1,5 +1,5 @@
-import { Repo, RepoType } from '@/entity/Repo'
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { RepoType } from './share'
 
 export enum ListRepoSortType {
     LAST_UPDATE = 0,
@@ -70,7 +70,7 @@ export class RepoDto {
     @ApiProperty({
         type: 'string',
     })
-    create_time: Date
+    create_time: number
 
     @ApiProperty({
         type: 'number',
@@ -91,7 +91,7 @@ export class RepoDto {
     @ApiProperty({
         type: 'string',
     })
-    update_time: Date
+    update_time: number
 
     // 创建仓库时为空
     @ApiProperty({

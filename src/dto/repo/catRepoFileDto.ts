@@ -1,4 +1,3 @@
-import { RepoType } from '@/entity/Repo'
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 
 export class CatRepoFileReqDto {

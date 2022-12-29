@@ -1,5 +1,5 @@
-import { RepoType } from '@/entity/Repo'
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { RepoType } from './share'
 
 export class CreateRepoReqDto {
     @ApiProperty({
