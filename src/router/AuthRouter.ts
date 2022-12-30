@@ -75,7 +75,7 @@ export class AuthRouter {
         },
         fields: [{ name: 'avatar' }],
     })
-    async uploadAvatar(@Files() files: Express.Multer.File[]) {
-        return {}
+    async uploadAvatar(@TokenPlyload('id') id: number) {
+        return await this.authService.uploadAvatar(id)
     }
 }

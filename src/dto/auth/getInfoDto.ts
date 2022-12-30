@@ -31,9 +31,9 @@ export class InfoDto {
     created_time: Date
 
     @ApiProperty({
-        type: 'string',
+        type: 'number',
     })
-    avatar: string
+    avatar_version: number
 
     @ApiProperty({
         type: 'string',

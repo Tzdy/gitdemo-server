@@ -12,6 +12,7 @@ import { RegisterResDto } from '@/dto/auth/registryDto'
 import { SetInfoReqDto, SetInfoResDto } from '@/dto/auth/setInfoDto'
 import { FindOptionsWhere } from 'typeorm'
 import { assign } from '@/utils/assign'
+import { UploadAvatarResDto } from '@/dto/auth/uploadAvatarDto'
 
 export class AuthServiceImpl implements AuthService {
     public async login(
@@ -47,7 +48,7 @@ export class AuthServiceImpl implements AuthService {
                 'id',
                 'nickname',
                 'address',
-                'avatar',
+                'avatar_version',
                 'bio',
                 'created_time',
                 'link',
@@ -77,7 +78,7 @@ export class AuthServiceImpl implements AuthService {
                 'id',
                 'nickname',
                 'address',
-                'avatar',
+                'avatar_version',
                 'bio',
                 'created_time',
                 'link',
@@ -153,6 +154,34 @@ export class AuthServiceImpl implements AuthService {
         }
         setInfoResDto.message = '修改成功'
         return setInfoResDto
+    }
+
+    public async uploadAvatar(userId: number): Promise<UploadAvatarResDto> {
+        const user = await model.manager.findOne(User, {
+            where: {
+                id: userId,
+            },
+            select: ['avatar_version'],
+        })
+        if (!user) {
+            throw new HttpAuthException(10000, '用户不存在')
+        }
+        let version = user.avatar_version + 1
+        if (version > 10) {
+            version = 1
+        }
+        await model.manager.update(
+            User,
+            { id: userId },
+            {
+                avatar_version: version,
+            }
+        )
+        const resDto = new UploadAvatarResDto()
+        resDto.data = {
+            v: version,
+        }
+        return resDto
     }
 
     private async createUserRootDir(username: string) {

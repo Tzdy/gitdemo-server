@@ -27,10 +27,8 @@ export class User {
     })
     created_time: Date
 
-    @Column({
-        default: 'https://www.tsdy.club/git/manage/user/info/avatar/Tsdy',
-    })
-    avatar: string
+    @Column()
+    avatar_version: number
 
     @Column({
         default: '',
