@@ -25,6 +25,7 @@ import {
 import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 import { assign } from '@/utils/assign'
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
+import { HttpException } from '@tsdy/express-plugin-exception'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -54,6 +55,7 @@ export class RepoServiceImpl implements RepoService {
                 type: dto.type,
                 user_id: userId,
                 about: dto.about,
+                language_analysis: [],
             })
         } catch (err: any) {
             if (err.code === 'ER_DUP_ENTRY') {
@@ -61,6 +63,8 @@ export class RepoServiceImpl implements RepoService {
                     20001,
                     `repo name ${dto.repoName} is exist.`
                 )
+            } else {
+                throw new HttpException(500, err.message)
             }
         }
         const user = await model.manager.findOne(User, {
@@ -95,12 +99,22 @@ export class RepoServiceImpl implements RepoService {
         if (typeof userId === 'number') {
             const { isMyself } = await this.findUser(userId, dto.username)
             dto.repoType ? (where.type = dto.repoType) : null
+            assign(where, 'user_id', userId)
             // 如果不是自己，不能看私有仓库
             if (!isMyself && where.type === RepoType.PRIVATE) {
                 where.type = RepoType.PUBLIC
             }
         } else {
             // 游客只能看公有仓库
+            const visitor = await model.manager.findOne(User, {
+                where: {
+                    username: dto.username,
+                },
+            })
+            if (!visitor) {
+                throw new HttpOKException(20003, '用户不存在')
+            }
+            assign(where, 'user_id', visitor.id)
             where.type = RepoType.PUBLIC
         }
         dto.languageId ? (where.language_id = dto.languageId) : null
@@ -241,9 +255,11 @@ export class RepoServiceImpl implements RepoService {
         assign(updateVal, 'language_id', dto.languageId)
         assign(updateVal, 'type', dto.type)
         assign(updateVal, 'website', dto.website)
+        assign(updateVal, 'is_overview', dto.isOverview)
         await model.manager.update(
             Repo,
             {
+                id: dto.repoId,
                 user_id: userId,
             },
             updateVal

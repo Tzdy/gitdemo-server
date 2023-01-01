@@ -64,7 +64,8 @@ export class Repo {
 
     // 创建仓库时为空
     @Column({
-        default: null,
+        type: 'integer',
+        default: -1,
     })
     language_id: number
 

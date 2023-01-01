@@ -27,7 +27,9 @@ export class User {
     })
     created_time: Date
 
-    @Column()
+    @Column({
+        default: 0,
+    })
     avatar_version: number
 
     @Column({
@@ -51,10 +53,14 @@ export class User {
     twitter: string
 
     // 仓库总数
-    @Column()
+    @Column({
+        default: 0,
+    })
     repo_total_num: number
 
     // star总数
-    @Column()
+    @Column({
+        default: 0,
+    })
     star_total_num: number
 }

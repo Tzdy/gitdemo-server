@@ -3,6 +3,11 @@ import { RepoType } from './share'
 
 export class SetRepoReqDto {
     @ApiProperty({
+        type: 'number',
+    })
+    repoId: number
+
+    @ApiProperty({
         type: 'string',
     })
     repoName?: string
@@ -26,6 +31,12 @@ export class SetRepoReqDto {
         type: 'number',
     })
     languageId?: number
+
+    // 0 关闭。 1-6顺序
+    @ApiProperty({
+        type: 'number',
+    })
+    isOverview?: number
 }
 
 export class SetRepoResDto {

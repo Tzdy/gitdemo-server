@@ -6,7 +6,6 @@ export class RegisterReqDto {
         type: 'string',
     })
     @IsString()
-    @IsAlpha()
     @IsByteLength(3, 18)
     username: string
 
