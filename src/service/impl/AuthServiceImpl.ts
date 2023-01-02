@@ -62,8 +62,12 @@ export class AuthServiceImpl implements AuthService {
         if (!user) {
             throw new HttpAuthException(20001, '用户不存在')
         }
+        const { created_time, ...userData } = user
         infoResDto.data = {
-            info: user,
+            info: {
+                created_time: created_time.getTime(),
+                ...userData,
+            },
         }
         return infoResDto
     }
@@ -93,8 +97,12 @@ export class AuthServiceImpl implements AuthService {
         if (!user) {
             throw new HttpAuthException(20001, '用户不存在')
         }
+        const { created_time, ...userData } = user
         infoResDto.data = {
-            info: user,
+            info: {
+                created_time: created_time.getTime(),
+                ...userData,
+            },
         }
         return infoResDto
     }

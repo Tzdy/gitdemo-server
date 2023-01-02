@@ -26,9 +26,9 @@ export class InfoDto {
     nickname: string
 
     @ApiProperty({
-        type: 'string',
+        type: 'number',
     })
-    created_time: Date
+    created_time: number
 
     @ApiProperty({
         type: 'number',
