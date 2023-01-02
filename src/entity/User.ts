@@ -40,6 +40,11 @@ export class User {
     @Column({
         default: '',
     })
+    org: string
+
+    @Column({
+        default: '',
+    })
     address: string
 
     @Column({

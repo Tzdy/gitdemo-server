@@ -50,6 +50,7 @@ export class AuthServiceImpl implements AuthService {
                 'address',
                 'avatar_version',
                 'bio',
+                'org',
                 'created_time',
                 'link',
                 'twitter',
@@ -80,6 +81,7 @@ export class AuthServiceImpl implements AuthService {
                 'address',
                 'avatar_version',
                 'bio',
+                'org',
                 'created_time',
                 'link',
                 'twitter',
@@ -132,11 +134,12 @@ export class AuthServiceImpl implements AuthService {
             throw new HttpOKException(20001, '请输入需要修改的值')
         }
         const updateVal: Partial<User> = {}
-        keys.forEach((key) => {
-            if (Reflect.has(info, key)) {
-                Reflect.set(updateVal, key, Reflect.get(info, key))
-            }
-        })
+        assign(updateVal, 'nickname', info.nickname)
+        assign(updateVal, 'org', info.org)
+        assign(updateVal, 'address', info.address)
+        assign(updateVal, 'bio', info.bio)
+        assign(updateVal, 'link', info.link)
+        assign(updateVal, 'twitter', info.twitter)
         try {
             await model.manager.update(
                 User,

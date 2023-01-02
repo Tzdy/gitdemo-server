@@ -43,6 +43,11 @@ export class InfoDto {
     @ApiProperty({
         type: 'string',
     })
+    org: string
+
+    @ApiProperty({
+        type: 'string',
+    })
     address: string
 
     @ApiProperty({

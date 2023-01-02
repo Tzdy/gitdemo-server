@@ -6,32 +6,32 @@ export class SetInfoReqDto {
     @ApiProperty({
         type: 'string',
     })
-    nickname: string
+    nickname?: string
 
     @ApiProperty({
         type: 'string',
     })
-    avatar: string
+    bio?: string
 
     @ApiProperty({
         type: 'string',
     })
-    bio: string
+    address?: string
 
     @ApiProperty({
         type: 'string',
     })
-    address: string
+    link?: string
 
     @ApiProperty({
         type: 'string',
     })
-    link: string
+    twitter?: string
 
     @ApiProperty({
         type: 'string',
     })
-    twitter: string
+    org?: string
 }
 
 export class SetInfoResDto {
