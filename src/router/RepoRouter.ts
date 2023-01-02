@@ -52,13 +52,13 @@ export class RepoRouter {
 
     @Post('/list_all_repo_language')
     @ApiResponse(200, ListAllRepoLanguageResDto)
-    @UseGuards(TokenMiddleWare)
+    @UseGuards(AvailableTokenMiddleWare)
     @ApiSecurity('token')
     async listAllRepoLanguage(
         @Body() dto: ListAllRepoLanguageReqDto,
-        @TokenPlyload('id') id: number
+        @TokenPlyload('id') id?: number
     ) {
-        return this.repoService.listAllRepoLanguage(id, dto)
+        return this.repoService.listAllRepoLanguage(dto, id)
     }
 
     @Post('/set_repo')
@@ -71,23 +71,23 @@ export class RepoRouter {
 
     @Post('/list_repo_file')
     @ApiResponse(200, ListRepoFileResDto)
-    @UseGuards(TokenMiddleWare)
+    @UseGuards(AvailableTokenMiddleWare)
     @ApiSecurity('token')
     async listRepoFile(
         @Body() dto: ListRepoFileReqDto,
-        @TokenPlyload('id') id: number
+        @TokenPlyload('id') id?: number
     ) {
-        return this.repoService.listRepoFile(id, dto)
+        return this.repoService.listRepoFile(dto, id)
     }
 
     @Post('/cat_repo_file')
     @ApiResponse(200, CatRepoFileResDto)
-    @UseGuards(TokenMiddleWare)
+    @UseGuards(AvailableTokenMiddleWare)
     @ApiSecurity('token')
     async catRepoFile(
         @Body() dto: CatRepoFileReqDto,
-        @TokenPlyload('id') id: number
+        @TokenPlyload('id') id?: number
     ) {
-        return this.repoService.catRepoFile(id, dto)
+        return this.repoService.catRepoFile(dto, id)
     }
 }

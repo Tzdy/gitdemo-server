@@ -7,14 +7,27 @@ export class ListAllRepoLanguageReqDto {
     username: string
 }
 
+class LanguageItem {
+    @ApiProperty({
+        type: 'number',
+    })
+    id: number
+
+    @ApiProperty({
+        type: 'string',
+    })
+    name: string
+}
+
 class ResData {
     @ApiProperty({
         type: 'array',
         items: {
-            type: 'string',
+            type: 'object',
+            ref: LanguageItem,
         },
     })
-    languageList: Array<string>
+    languageList: Array<LanguageItem>
 }
 
 export class ListAllRepoLanguageResDto {

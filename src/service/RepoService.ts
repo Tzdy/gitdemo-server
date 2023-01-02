@@ -21,18 +21,18 @@ export interface RepoService {
 
     // 获取该用户所有仓库的语言列表
     listAllRepoLanguage(
-        userId: number,
-        dto: ListAllRepoLanguageReqDto
+        dto: ListAllRepoLanguageReqDto,
+        userId?: number
     ): Promise<ListAllRepoLanguageResDto>
 
     // 获取带commit信息的tree列表
     listRepoFile(
-        userId: number,
-        dto: ListRepoFileReqDto
+        dto: ListRepoFileReqDto,
+        userId?: number
     ): Promise<ListRepoFileResDto>
 
     catRepoFile(
-        userId: number,
-        dto: CatRepoFileReqDto
+        dto: CatRepoFileReqDto,
+        userId?: number
     ): Promise<CatRepoFileResDto>
 }

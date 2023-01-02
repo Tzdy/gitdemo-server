@@ -29,7 +29,7 @@ import { HttpException } from '@tsdy/express-plugin-exception'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
-    private async findUser(myselfId: number, username: string) {
+    private async findUser(username: string, myselfId?: number) {
         const user = await model.manager.findOne(User, {
             where: {
                 username,
@@ -96,31 +96,16 @@ export class RepoServiceImpl implements RepoService {
     ): Promise<ListRepoResDto> {
         const where: FindOptionsWhere<Repo> = {}
         const order: FindOptionsOrder<Repo> = {}
-        if (typeof userId === 'number') {
-            const { isMyself } = await this.findUser(userId, dto.username)
-            dto.repoType ? (where.type = dto.repoType) : null
-            assign(where, 'user_id', userId)
-            // 如果不是自己，不能看私有仓库
-            if (!isMyself && where.type === RepoType.PRIVATE) {
-                where.type = RepoType.PUBLIC
-            }
+        const { isMyself, user } = await this.findUser(dto.username, userId)
+        assign(where, 'user_id', user.id)
+        if (isMyself) {
+            assign(where, 'type', dto.repoType)
         } else {
-            // 游客只能看公有仓库
-            const visitor = await model.manager.findOne(User, {
-                where: {
-                    username: dto.username,
-                },
-            })
-            if (!visitor) {
-                throw new HttpOKException(20003, '用户不存在')
-            }
-            assign(where, 'user_id', visitor.id)
             where.type = RepoType.PUBLIC
         }
-        dto.languageId ? (where.language_id = dto.languageId) : null
-        dto.keyword ? (where.repo_name = Like(`${dto.keyword}%`)) : null
-        dto.isOverview ? (where.is_overview = Not(0)) : null
-
+        assign(where, 'language_id', dto.languageId)
+        assign(where, 'repo_name', dto.keyword && Like(`${dto.keyword}%`))
+        assign(where, 'is_overview', dto.isOverview && Not(0))
         switch (dto.sort) {
             case ListRepoSortType.LAST_UPDATE:
                 order.update_time = 'DESC'
@@ -171,15 +156,14 @@ export class RepoServiceImpl implements RepoService {
         return resDto
     }
 
-    async listRepoFile(userId: number, dto: ListRepoFileReqDto) {
-        const { isMyself, user } = await this.findUser(userId, dto.username)
-        const gitUtil = createGitUtil(dto.username, dto.repoName)
+    async listRepoFile(dto: ListRepoFileReqDto, userId?: number) {
+        const { isMyself, user } = await this.findUser(dto.username, userId)
+        const repoWhere: FindOptionsWhere<Repo> = {}
+        repoWhere.user_id = user.id
+        repoWhere.repo_name = dto.repoName
         // 目标用户的仓库信息
         const repo = await model.manager.findOne(Repo, {
-            where: {
-                user_id: user.id,
-                repo_name: dto.repoName,
-            },
+            where: repoWhere,
         })
         if (!repo) {
             throw new HttpOKException(20001, '仓库不存在')
@@ -189,6 +173,7 @@ export class RepoServiceImpl implements RepoService {
                 throw new HttpOKException(20002, '没有权限查看该仓库')
             }
         }
+        const gitUtil = createGitUtil(dto.username, dto.repoName)
         const itemList = await gitUtil.findTree(dto.branch, dto.path)
         const itemCommitList = await model.manager.find(Item, {
             where: {
@@ -222,28 +207,32 @@ export class RepoServiceImpl implements RepoService {
     }
 
     public async listAllRepoLanguage(
-        userId: number,
-        dto: ListAllRepoLanguageReqDto
+        dto: ListAllRepoLanguageReqDto,
+        userId?: number
     ): Promise<ListAllRepoLanguageResDto> {
-        const { isMyself, user } = await this.findUser(userId, dto.username)
         const where: FindOptionsWhere<Repo> = {}
+        const { isMyself, user } = await this.findUser(dto.username, userId)
         where.user_id = user.id
         if (!isMyself) {
             where.type = RepoType.PUBLIC
         }
-        const list = await model.manager.find(Repo, {
-            select: ['language_id'],
-            where,
-        })
+        const list = await model.manager
+            .getRepository(Repo)
+            .createQueryBuilder()
+            .select(['language_id'])
+            .distinctOn(['language_id'])
+            .where(where)
+            .getMany()
         const resData = new ListAllRepoLanguageResDto()
         resData.data = {
             languageList: list
-                .map((item) =>
-                    parseLanguageId(item.language_id)
+                .map((item) => ({
+                    name: parseLanguageId(item.language_id)
                         ? parseLanguageId(item.language_id).name
-                        : ''
-                )
-                .filter((item) => item),
+                        : '',
+                    id: item.language_id,
+                }))
+                .filter((item) => item.name),
         }
         return resData
     }
@@ -269,10 +258,10 @@ export class RepoServiceImpl implements RepoService {
     }
 
     async catRepoFile(
-        userId: number,
-        dto: CatRepoFileReqDto
+        dto: CatRepoFileReqDto,
+        userId?: number
     ): Promise<CatRepoFileResDto> {
-        const { isMyself, user } = await this.findUser(userId, dto.username)
+        const { isMyself, user } = await this.findUser(dto.username, userId)
         // 目标用户的仓库信息
         const repo = await model.manager.findOne(Repo, {
             where: {
@@ -290,7 +279,6 @@ export class RepoServiceImpl implements RepoService {
         }
         const gitUtil = createGitUtil(dto.username, dto.repoName)
         const { size, value } = await gitUtil.findBlob(dto.branch, dto.path)
-        console.log(dto.branch, dto.path)
         const resData = new CatRepoFileResDto()
         resData.data = {
             size,
