@@ -5,6 +5,7 @@ import { User } from '@/entity/User'
 import { DataSource } from 'typeorm'
 export const model = new DataSource({
     type: 'mysql',
+    charset: 'utf8mb4',
     host: process.env.MYSQL_HOST || 'localhost',
     port: Number(process.env.MYSQL_PORT) || 3306,
     username: process.env.MYSQL_USERNAME,
