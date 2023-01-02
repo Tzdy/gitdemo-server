@@ -22,6 +22,10 @@ export interface RouterOptions {
     routes: Record<string, RouteOptions>
 }
 
+function noopMiddleware(req: Request, res: Response, next: NextFunction) {
+    next()
+}
+
 function getRouterOptions(target: any) {
     if (target.prototype) {
         const options = Reflect.getMetadata('router', target) as RouterOptions
@@ -54,7 +58,8 @@ function getRouterOptions(target: any) {
                 middleware: [],
                 parameter: [],
                 swagger: {
-                    parameter: {},
+                    // 参考express-plugin-swagger的types
+                    parameter: null,
                     responses: {},
                     security: [],
                 },
@@ -84,10 +89,12 @@ export function applyRouter(router: Router, Ctors: any[]) {
                     responses: swagger.responses,
                     security: swagger.security,
                 }),
-                validatorMiddleWare(
-                    swagger.parameter.dto,
-                    swagger.parameter.in
-                ),
+                swagger.parameter
+                    ? validatorMiddleWare(
+                          swagger.parameter.dto,
+                          swagger.parameter.in
+                      )
+                    : noopMiddleware,
                 asyncException(async (req: Request, res: Response) => {
                     const result = await handle.apply(
                         options.ctx,

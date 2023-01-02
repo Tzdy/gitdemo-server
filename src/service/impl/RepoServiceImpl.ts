@@ -219,10 +219,11 @@ export class RepoServiceImpl implements RepoService {
         const list = await model.manager
             .getRepository(Repo)
             .createQueryBuilder()
-            .select(['language_id'])
-            .distinctOn(['language_id'])
+            .distinct(true)
+            .select('language_id')
             .where(where)
-            .getMany()
+            .getRawMany()
+        // 用getMany时distinct不生效。。。
         const resData = new ListAllRepoLanguageResDto()
         resData.data = {
             languageList: list
