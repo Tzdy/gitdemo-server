@@ -5,7 +5,6 @@ import { Git as GitUtil } from '@tsdy/git-util'
 import { join } from 'path'
 import { Repo } from '@/entity/Repo'
 import { Commit } from '@/entity/Commit'
-import { Item } from '@/entity/Item'
 export class GitServiceImpl implements GitService {
     async syncCommit(
         repoName: string,
@@ -66,18 +65,6 @@ export class GitServiceImpl implements GitService {
         const itemList = await gitUtil.findDiffItem(
             diffCommitList.map((commitHash) => commitHash)
         )
-        await model.manager.insert(
-            Item,
-            itemList.map((item) => {
-                const itemEntity = new Item()
-                itemEntity.commit_hash = item.commitHash
-                itemEntity.hash = item.hash
-                itemEntity.repo_id = repo.id
-                itemEntity.user_id = user.id
-                return itemEntity
-            })
-        )
-
         const languageList = repo.language_analysis
         itemList.forEach((item) => {
             const langItem = languageList.find(

@@ -1,5 +1,4 @@
 import { Commit } from '@/entity/Commit'
-import { Item } from '@/entity/Item'
 import { Repo } from '@/entity/Repo'
 import { User } from '@/entity/User'
 import { UserRepoRelation } from '@/entity/UserRepoRelation'
@@ -13,7 +12,7 @@ export const model = new DataSource({
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
     synchronize: true,
-    entities: [User, Repo, Item, Commit, UserRepoRelation],
+    entities: [User, Repo, Commit, UserRepoRelation],
 })
 
 export const initialize = model.initialize.bind(model)

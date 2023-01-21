@@ -9,14 +9,12 @@ import { User } from '@/entity/User'
 import { model } from '@/model'
 import { HttpAuthException, HttpOKException } from '@/utils/exception'
 import { RepoService } from '@/service/RepoService'
-import { FindOptionsOrder, FindOptionsWhere, In, Like, Not } from 'typeorm'
+import { FindOptionsOrder, FindOptionsWhere, Like, Not } from 'typeorm'
 import { createGitUtil } from '@/utils/git'
 import {
     ListRepoFileReqDto,
     ListRepoFileResDto,
 } from '@/dto/repo/listRepoFileDto'
-import { Item } from '@/entity/Item'
-import { Commit } from '@tsdy/git-util/src/git.interface'
 import { parseLanguageId } from '@tsdy/git-util'
 import {
     ListAllRepoLanguageReqDto,
@@ -26,6 +24,7 @@ import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 import { assign } from '@/utils/assign'
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 import { HttpException } from '@tsdy/express-plugin-exception'
+import { TreeItem } from '@tsdy/git-util/src/git.interface'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -174,34 +173,24 @@ export class RepoServiceImpl implements RepoService {
             }
         }
         const gitUtil = createGitUtil(dto.username, dto.repoName)
-        const itemList = await gitUtil.findTree(dto.branch, dto.path)
-        const itemCommitList = await model.manager.find(Item, {
-            where: {
-                user_id: user.id,
-                repo_id: repo.id,
-                hash: In(itemList.map((item) => item.hash)),
-            },
-        })
-        const commitList = await gitUtil.findCommit(
-            dto.branch,
-            undefined,
-            undefined,
-            itemCommitList.map((item) => item.commit_hash)
-        )
+        let itemList: Required<TreeItem>[] = []
+        try {
+            itemList = await gitUtil.lsTree(dto.branch, dto.path, true)
+        } catch (err: any) {
+            if (err.code === 128) {
+                throw new HttpOKException(20003, `分支${dto.branch}不存在`)
+            }
+            throw new HttpException(500, err.message)
+        }
+        if (itemList.length === 0) {
+            throw new HttpOKException(
+                20004,
+                `分支${dto.branch}的路径${dto.path}不存在`
+            )
+        }
         const resDto = new ListRepoFileResDto()
         resDto.data = {
-            list: itemList.map((item) => {
-                const itemCommit = itemCommitList.find(
-                    (i) => i.hash === item.hash
-                ) as Item
-                const commit = commitList.find(
-                    (i) => i.commitHash === itemCommit.commit_hash
-                ) as Commit
-                return {
-                    ...commit,
-                    ...item,
-                }
-            }),
+            list: itemList,
         }
         return resDto
     }
@@ -279,7 +268,7 @@ export class RepoServiceImpl implements RepoService {
             }
         }
         const gitUtil = createGitUtil(dto.username, dto.repoName)
-        const { size, value } = await gitUtil.findBlob(dto.branch, dto.path)
+        const { size, value } = await gitUtil.catFile(dto.branch, dto.path)
         const resData = new CatRepoFileResDto()
         resData.data = {
             size,

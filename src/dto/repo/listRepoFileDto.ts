@@ -4,11 +4,11 @@ export class TreeCommitItem {
     @ApiProperty({
         type: 'string',
     })
-    username: string
+    commitUser: string
     @ApiProperty({
         type: 'string',
     })
-    time: Date
+    commitTime: Date
     @ApiProperty({
         type: 'string',
     })
@@ -16,11 +16,7 @@ export class TreeCommitItem {
     @ApiProperty({
         type: 'string',
     })
-    treeHash: string
-    @ApiProperty({
-        type: 'string',
-    })
-    comment: string
+    commitContent: string
     @ApiProperty({
         type: 'string',
         example: 'blob | tree',
