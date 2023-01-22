@@ -1,5 +1,6 @@
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 import { CreateRepoResDto, CreateRepoReqDto } from '@/dto/repo/createRepoDto'
+import { GetOneRepoReqDto, GetOneRepoResDto } from '@/dto/repo/getOneRepoDto'
 import {
     ListAllRepoLanguageReqDto,
     ListAllRepoLanguageResDto,
@@ -37,6 +38,17 @@ export class RepoRouter {
         @TokenPlyload('id') id: number
     ) {
         return this.repoService.createRepo(id, dto)
+    }
+
+    @Post('/get_one_repo')
+    @ApiResponse(200, GetOneRepoResDto)
+    @UseGuards(AvailableTokenMiddleWare)
+    @ApiSecurity('token')
+    async getOneRepo(
+        @Body() body: GetOneRepoReqDto,
+        @TokenPlyload('id') id?: number
+    ) {
+        return await this.repoService.getOneRepo(body, id)
     }
 
     @Post('/list_repo')

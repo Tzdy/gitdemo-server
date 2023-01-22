@@ -15,7 +15,6 @@ import {
     ListRepoFileReqDto,
     ListRepoFileResDto,
 } from '@/dto/repo/listRepoFileDto'
-import { parseLanguageId } from '@tsdy/git-util'
 import {
     ListAllRepoLanguageReqDto,
     ListAllRepoLanguageResDto,
@@ -25,6 +24,8 @@ import { assign } from '@/utils/assign'
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 import { HttpException } from '@tsdy/express-plugin-exception'
 import { TreeItem } from '@tsdy/git-util/src/git.interface'
+import { GetOneRepoReqDto, GetOneRepoResDto } from '@/dto/repo/getOneRepoDto'
+import { parseLanguage } from '@/utils/language'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -89,6 +90,47 @@ export class RepoServiceImpl implements RepoService {
         return createRepoResDto
     }
 
+    async getOneRepo(
+        dto: GetOneRepoReqDto,
+        userId?: number | undefined
+    ): Promise<GetOneRepoResDto> {
+        const { user, isMyself } = await this.findUser(dto.username, userId)
+        const where: FindOptionsWhere<Repo> = {
+            user_id: user.id,
+            repo_name: dto.repoName,
+        }
+        if (!isMyself) {
+            assign(where, 'type', RepoType.PUBLIC)
+        }
+        const repo = await model.manager.findOne(Repo, {
+            where,
+        })
+        if (!repo) {
+            throw new HttpOKException(
+                20001,
+                `仓库${dto.username}/${dto.repoName}不存在`
+            )
+        }
+        const resData = new GetOneRepoResDto()
+        resData.data = {
+            id: repo.id,
+            repoName: repo.repo_name,
+            abount: repo.about,
+            createTime: repo.create_time.getTime(),
+            isOverview: repo.is_overview,
+            starNum: repo.star_num,
+            type: repo.type,
+            updateTime: repo.update_time.getTime(),
+            website: repo.website,
+            languageAnalysis: repo.language_analysis.map((item) => ({
+                language: parseLanguage(item.language_id),
+                languageId: item.language_id,
+                fileNum: item.file_num,
+            })),
+        }
+        return resData
+    }
+
     async listRepo(
         dto: ListRepoReqDto,
         userId?: number
@@ -137,15 +179,8 @@ export class RepoServiceImpl implements RepoService {
         resDto.data = {
             repoList: list.map((item) => {
                 const { language_id, create_time, update_time, ...it } = item
-                let language = ''
-                if (Number.isInteger(language_id)) {
-                    // 主语言id为-1的，不展示内容。
-                    language = parseLanguageId(language_id)
-                        ? parseLanguageId(language_id).name
-                        : ''
-                }
                 return {
-                    language,
+                    language: parseLanguage(language_id),
                     create_time: create_time.getTime(),
                     update_time: update_time.getTime(),
                     ...it,
@@ -211,15 +246,13 @@ export class RepoServiceImpl implements RepoService {
             .distinct(true)
             .select('language_id')
             .where(where)
-            .getRawMany()
+            .getRawMany<Repo>()
         // 用getMany时distinct不生效。。。
         const resData = new ListAllRepoLanguageResDto()
         resData.data = {
             languageList: list
                 .map((item) => ({
-                    name: parseLanguageId(item.language_id)
-                        ? parseLanguageId(item.language_id).name
-                        : '',
+                    name: parseLanguage(item.language_id),
                     id: item.language_id,
                 }))
                 .filter((item) => item.name),

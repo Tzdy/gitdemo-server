@@ -11,9 +11,15 @@ import {
 } from '@/dto/repo/listAllRepoLanguageDto'
 import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
+import { GetOneRepoReqDto, GetOneRepoResDto } from '@/dto/repo/getOneRepoDto'
 
 export interface RepoService {
     createRepo(userId: number, dto: CreateRepoReqDto): Promise<CreateRepoResDto>
+
+    getOneRepo(
+        dto: GetOneRepoReqDto,
+        userId?: number
+    ): Promise<GetOneRepoResDto>
 
     setRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto>
 
