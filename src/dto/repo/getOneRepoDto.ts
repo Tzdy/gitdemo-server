@@ -92,12 +92,12 @@ export class GetOneRepoResDto {
     @ApiProperty({
         type: 'number',
     })
-    code: number
+    code: number = 20000
 
     @ApiProperty({
         type: 'string',
     })
-    message: string
+    message: string = 'ok'
 
     @ApiProperty({
         type: 'object',

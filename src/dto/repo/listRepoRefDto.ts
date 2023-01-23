@@ -1,6 +1,11 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 
-export class CatRepoFileReqDto {
+export enum RefType {
+    BRANCH = 0,
+    TAG = 1,
+}
+
+export class ListRepoRefReqDto {
     @ApiProperty({
         type: 'string',
     })
@@ -11,31 +16,37 @@ export class CatRepoFileReqDto {
     })
     repoName: string
 
-    // 可以是分支名或commitHash
+    @ApiProperty({
+        type: 'integer',
+        example: `${RefType.BRANCH} branch, ${RefType.TAG} tag`,
+    })
+    type: RefType
+}
+
+class RefItem {
     @ApiProperty({
         type: 'string',
     })
-    branch: string
+    name: string
 
     @ApiProperty({
         type: 'string',
     })
-    path: string
+    latestCommit: string
 }
 
 class Data {
     @ApiProperty({
-        type: 'integer',
+        type: 'array',
+        items: {
+            type: 'object',
+            ref: RefItem,
+        },
     })
-    size: number
-
-    @ApiProperty({
-        type: 'string',
-    })
-    value: string
+    list: RefItem[]
 }
 
-export class CatRepoFileResDto {
+export class ListRepoRefResDto {
     @ApiProperty({
         type: 'number',
     })
@@ -48,7 +59,6 @@ export class CatRepoFileResDto {
 
     @ApiProperty({
         type: 'object',
-        ref: Data,
     })
     data: Data
 }

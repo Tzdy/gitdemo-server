@@ -26,6 +26,11 @@ import { HttpException } from '@tsdy/express-plugin-exception'
 import { TreeItem } from '@tsdy/git-util/src/git.interface'
 import { GetOneRepoReqDto, GetOneRepoResDto } from '@/dto/repo/getOneRepoDto'
 import { parseLanguage } from '@/utils/language'
+import {
+    ListRepoRefReqDto,
+    ListRepoRefResDto,
+    RefType,
+} from '@/dto/repo/listRepoRefDto'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -188,6 +193,35 @@ export class RepoServiceImpl implements RepoService {
             }),
         }
         return resDto
+    }
+
+    async listRepoRef(
+        dto: ListRepoRefReqDto,
+        userId?: number | undefined
+    ): Promise<ListRepoRefResDto> {
+        const { isMyself, user } = await this.findUser(dto.username, userId)
+        if (!isMyself) {
+            const repo = await model.manager.findOne(Repo, {
+                where: {
+                    type: RepoType.PUBLIC,
+                    repo_name: dto.repoName,
+                    user_id: user.id,
+                },
+            })
+            if (!repo) {
+                throw new HttpOKException(
+                    20001,
+                    `仓库${dto.username}/${dto.repoName}不存在`
+                )
+            }
+        }
+        const gitUtil = createGitUtil(user.username, dto.repoName)
+        const reflist = await gitUtil.showRef(dto.type === RefType.TAG)
+        const resData = new ListRepoRefResDto()
+        resData.data = {
+            list: reflist,
+        }
+        return resData
     }
 
     async listRepoFile(dto: ListRepoFileReqDto, userId?: number) {

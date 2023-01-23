@@ -33,7 +33,7 @@ export class GitServiceImpl implements GitService {
         if (!repo) {
             throw new Error(`the repo ${repoName} is not exist.`)
         }
-        const allBranchList = await gitUtil.findBranch()
+        const allBranchList = await gitUtil.showRef()
 
         // 如果分支数为1并且last为00000可以认为是仓库初始化提交，需要将HEAD移动到对应分支
         if (allBranchList.length === 1 && /0{36}/.test(last)) {

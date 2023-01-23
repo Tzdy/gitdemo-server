@@ -10,6 +10,7 @@ import {
     ListRepoFileReqDto,
     ListRepoFileResDto,
 } from '@/dto/repo/listRepoFileDto'
+import { ListRepoRefReqDto, ListRepoRefResDto } from '@/dto/repo/listRepoRefDto'
 import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 import { AvailableTokenMiddleWare, TokenMiddleWare } from '@/middleware/token'
 import { RepoServiceImpl } from '@/service/impl/RepoServiceImpl'
@@ -80,6 +81,20 @@ export class RepoRouter {
     async setRepo(@Body() dto: SetRepoReqDto, @TokenPlyload('id') id: number) {
         return this.repoService.setRepo(id, dto)
     }
+
+    @Post('/list_repo_ref')
+    @ApiResponse(200, ListRepoRefResDto)
+    @UseGuards(AvailableTokenMiddleWare)
+    @ApiSecurity('token')
+    async listRepoRef(
+        @Body() dto: ListRepoRefReqDto,
+        @TokenPlyload('id') id: number
+    ) {
+        return await this.repoService.listRepoRef(dto, id)
+    }
+
+    @Post('/get_one_latest_commit')
+    async getOneLatestCommit() {}
 
     @Post('/list_repo_file')
     @ApiResponse(200, ListRepoFileResDto)

@@ -43,10 +43,10 @@ export class SetRepoResDto {
     @ApiProperty({
         type: 'number',
     })
-    code: number
+    code: number = 20000
 
     @ApiProperty({
         type: 'string',
     })
-    message: string
+    message: string = 'ok'
 }

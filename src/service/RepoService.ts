@@ -12,6 +12,7 @@ import {
 import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 import { GetOneRepoReqDto, GetOneRepoResDto } from '@/dto/repo/getOneRepoDto'
+import { ListRepoRefReqDto, ListRepoRefResDto } from '@/dto/repo/listRepoRefDto'
 
 export interface RepoService {
     createRepo(userId: number, dto: CreateRepoReqDto): Promise<CreateRepoResDto>
@@ -24,6 +25,11 @@ export interface RepoService {
     setRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto>
 
     listRepo(dto: ListRepoReqDto, userId?: number): Promise<ListRepoResDto>
+
+    listRepoRef(
+        dto: ListRepoRefReqDto,
+        userId?: number
+    ): Promise<ListRepoRefResDto>
 
     // 获取该用户所有仓库的语言列表
     listAllRepoLanguage(
