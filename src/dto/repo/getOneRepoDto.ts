@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 import { RepoType } from './share'
 
 class LanguageItem {
@@ -88,17 +89,7 @@ class Data {
     languageAnalysis: LanguageItem[]
 }
 
-export class GetOneRepoResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number = 20000
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string = 'ok'
-
+export class GetOneRepoResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
         ref: Data,

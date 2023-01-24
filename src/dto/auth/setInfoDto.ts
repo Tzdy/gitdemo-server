@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 
 // set info
 
@@ -34,14 +35,4 @@ export class SetInfoReqDto {
     org?: string
 }
 
-export class SetInfoResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number = 20000
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string
-}
+export class SetInfoResDto extends HttpResponse {}

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 
 export class CatRepoFileReqDto {
     @ApiProperty({
@@ -35,17 +36,7 @@ class Data {
     value: string
 }
 
-export class CatRepoFileResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number = 20000
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string = 'ok'
-
+export class CatRepoFileResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
         ref: Data,

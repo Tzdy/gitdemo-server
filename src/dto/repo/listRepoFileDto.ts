@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 
 export class TreeCommitItem {
     @ApiProperty({
@@ -70,12 +71,7 @@ class ResData {
     list: Array<TreeCommitItem>
 }
 
-export class ListRepoFileResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number = 20000
-
+export class ListRepoFileResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
         ref: ResData,

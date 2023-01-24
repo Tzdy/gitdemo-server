@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 
 export class ListAllRepoLanguageReqDto {
     @ApiProperty({
@@ -30,7 +31,7 @@ class ResData {
     languageList: Array<LanguageItem>
 }
 
-export class ListAllRepoLanguageResDto {
+export class ListAllRepoLanguageResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
         ref: ResData,

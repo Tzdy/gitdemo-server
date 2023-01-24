@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 import { RepoType } from './share'
 
 export class SetRepoReqDto {
@@ -39,14 +40,4 @@ export class SetRepoReqDto {
     isOverview?: number
 }
 
-export class SetRepoResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number = 20000
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string = 'ok'
-}
+export class SetRepoResDto extends HttpResponse {}

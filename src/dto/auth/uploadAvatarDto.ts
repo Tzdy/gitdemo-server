@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 
 export class UploadAvatarReqDto {}
 
@@ -9,12 +10,7 @@ class Data {
     v: number
 }
 
-export class UploadAvatarResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number = 20000
-
+export class UploadAvatarResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
         ref: Data,

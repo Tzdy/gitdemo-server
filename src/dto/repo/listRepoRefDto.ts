@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 
 export enum RefType {
     BRANCH = 0,
@@ -46,19 +47,10 @@ class Data {
     list: RefItem[]
 }
 
-export class ListRepoRefResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number = 20000
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string = 'ok'
-
+export class ListRepoRefResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
+        ref: Data,
     })
     data: Data
 }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 
 export class ToggleStarReqDto {
     @ApiProperty({
@@ -7,14 +8,4 @@ export class ToggleStarReqDto {
     repoId: number
 }
 
-export class ToggleStarResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string
-}
+export class ToggleStarResDto extends HttpResponse {}

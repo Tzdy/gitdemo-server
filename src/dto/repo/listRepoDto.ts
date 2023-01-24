@@ -1,4 +1,5 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
+import { HttpResponse } from '../HttpResponse'
 import { RepoType } from './share'
 
 export enum ListRepoSortType {
@@ -111,17 +112,7 @@ class ListRepoResData {
     repoList: Array<RepoDto>
 }
 
-export class ListRepoResDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    code: number
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string
-
+export class ListRepoResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
         ref: ListRepoResData,

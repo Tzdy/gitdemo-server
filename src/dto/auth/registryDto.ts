@@ -1,5 +1,6 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 import { IsString, IsByteLength, IsAlpha } from 'class-validator'
+import { HttpResponse } from '../HttpResponse'
 
 export class RegisterReqDto {
     @ApiProperty({
@@ -17,15 +18,4 @@ export class RegisterReqDto {
     password: string
 }
 
-export class RegisterResDto {
-    @ApiProperty({
-        type: 'number',
-        example: '20000 | 20001',
-    })
-    code: number = 20000
-
-    @ApiProperty({
-        type: 'string',
-    })
-    message: string
-}
+export class RegisterResDto extends HttpResponse {}
