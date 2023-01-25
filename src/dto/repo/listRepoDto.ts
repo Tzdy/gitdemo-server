@@ -1,6 +1,6 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 import { HttpResponse } from '../HttpResponse'
-import { RepoType } from './share'
+import { RepoDto, RepoType } from './share'
 
 export enum ListRepoSortType {
     LAST_UPDATE = 0,
@@ -50,55 +50,6 @@ export class ListRepoReqDto {
         type: 'boolean',
     })
     isOverview?: boolean
-}
-
-export class RepoDto {
-    @ApiProperty({
-        type: 'number',
-    })
-    id: number
-
-    @ApiProperty({
-        type: 'number',
-    })
-    type: RepoType
-
-    @ApiProperty({
-        type: 'string',
-    })
-    repo_name: string
-
-    @ApiProperty({
-        type: 'string',
-    })
-    create_time: number
-
-    @ApiProperty({
-        type: 'number',
-    })
-    star_num: number
-
-    @ApiProperty({
-        type: 'integer',
-    })
-    is_overview: number
-
-    @ApiProperty({
-        type: 'string',
-    })
-    about: string
-
-    // 提交时间，不是commit time
-    @ApiProperty({
-        type: 'string',
-    })
-    update_time: number
-
-    // 创建仓库时为空
-    @ApiProperty({
-        type: 'string',
-    })
-    language: string
 }
 
 class ListRepoResData {

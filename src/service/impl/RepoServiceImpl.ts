@@ -120,13 +120,14 @@ export class RepoServiceImpl implements RepoService {
         resData.data = {
             id: repo.id,
             repoName: repo.repo_name,
-            abount: repo.about,
+            about: repo.about,
             createTime: repo.create_time.getTime(),
             isOverview: repo.is_overview,
             starNum: repo.star_num,
             type: repo.type,
             updateTime: repo.update_time.getTime(),
             website: repo.website,
+            language: parseLanguage(repo.language_id),
             languageAnalysis: repo.language_analysis.map((item) => ({
                 language: parseLanguage(item.language_id),
                 languageId: item.language_id,
@@ -182,13 +183,17 @@ export class RepoServiceImpl implements RepoService {
         })
         const resDto = new ListRepoResDto()
         resDto.data = {
-            repoList: list.map((item) => {
-                const { language_id, create_time, update_time, ...it } = item
+            repoList: list.map((repo) => {
                 return {
-                    language: parseLanguage(language_id),
-                    create_time: create_time.getTime(),
-                    update_time: update_time.getTime(),
-                    ...it,
+                    id: repo.id,
+                    repoName: repo.repo_name,
+                    about: repo.about,
+                    createTime: repo.create_time.getTime(),
+                    isOverview: repo.is_overview,
+                    starNum: repo.star_num,
+                    type: repo.type,
+                    updateTime: repo.update_time.getTime(),
+                    language: parseLanguage(repo.language_id),
                 }
             }),
         }
