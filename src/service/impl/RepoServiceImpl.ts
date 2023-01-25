@@ -31,6 +31,10 @@ import {
     ListRepoRefResDto,
     RefType,
 } from '@/dto/repo/listRepoRefDto'
+import {
+    GetOneRepoCommitReqDto,
+    GetOneRepoCommitResDto,
+} from '@/dto/repo/getOneRepoCommit'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -47,6 +51,29 @@ export class RepoServiceImpl implements RepoService {
             isMyself: myselfId === user.id,
             user,
         }
+    }
+
+    private async getAndCheckRepo(
+        isMyself: boolean,
+        repoName: string,
+        userId: number
+    ) {
+        // 目标用户的仓库信息
+        const repo = await model.manager.findOne(Repo, {
+            where: {
+                user_id: userId,
+                repo_name: repoName,
+            },
+        })
+        if (!repo) {
+            throw new HttpOKException(20001, '仓库不存在')
+        }
+        if (!isMyself) {
+            if (repo.type === RepoType.PRIVATE) {
+                throw new HttpOKException(20002, '没有权限查看该仓库')
+            }
+        }
+        return repo
     }
 
     public async createRepo(
@@ -299,7 +326,10 @@ export class RepoServiceImpl implements RepoService {
         return resData
     }
 
-    async setRepo(userId: number, dto: SetRepoReqDto): Promise<SetRepoResDto> {
+    public async setRepo(
+        userId: number,
+        dto: SetRepoReqDto
+    ): Promise<SetRepoResDto> {
         const updateVal: Partial<Repo> = {}
         assign(updateVal, 'about', dto.about)
         assign(updateVal, 'repo_name', dto.repoName)
@@ -319,7 +349,7 @@ export class RepoServiceImpl implements RepoService {
         return resData
     }
 
-    async catRepoFile(
+    public async catRepoFile(
         dto: CatRepoFileReqDto,
         userId?: number
     ): Promise<CatRepoFileResDto> {
@@ -347,6 +377,46 @@ export class RepoServiceImpl implements RepoService {
             value,
         }
 
+        return resData
+    }
+
+    public async getOneRepoCommit(
+        dto: GetOneRepoCommitReqDto,
+        userId?: number | undefined
+    ): Promise<GetOneRepoCommitResDto> {
+        const { isMyself, user } = await this.findUser(dto.username, userId)
+        // 目标用户的仓库信息
+        await this.getAndCheckRepo(isMyself, dto.repoName, user.id)
+        const gitUtil = createGitUtil(dto.username, dto.repoName)
+        const commitList = await gitUtil.findCommit(
+            dto.branch,
+            1,
+            1,
+            dto.commitHash ? [dto.commitHash] : undefined
+        )
+        const commit = commitList[0]
+        if (!commit) {
+            throw new HttpOKException(
+                20003,
+                `commit ${dto.commitHash ? dto.commitHash : ''}不存在`
+            )
+        }
+        const commitUser = await model.manager.findOne(User, {
+            where: {
+                username: commit.username,
+            },
+        })
+        const resData = new GetOneRepoCommitResDto()
+        resData.data = {
+            content: commit.comment,
+            createTime: commit.time.getTime(),
+            hash: commit.commitHash,
+            username: commit.username,
+        }
+        if (commitUser) {
+            resData.data.nickname = commitUser.nickname
+            resData.data.userId = commitUser.id
+        }
         return resData
     }
 }

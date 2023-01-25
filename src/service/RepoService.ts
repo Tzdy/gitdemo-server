@@ -13,6 +13,10 @@ import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 import { GetOneRepoReqDto, GetOneRepoResDto } from '@/dto/repo/getOneRepoDto'
 import { ListRepoRefReqDto, ListRepoRefResDto } from '@/dto/repo/listRepoRefDto'
+import {
+    GetOneRepoCommitReqDto,
+    GetOneRepoCommitResDto,
+} from '@/dto/repo/getOneRepoCommit'
 
 export interface RepoService {
     createRepo(userId: number, dto: CreateRepoReqDto): Promise<CreateRepoResDto>
@@ -47,4 +51,9 @@ export interface RepoService {
         dto: CatRepoFileReqDto,
         userId?: number
     ): Promise<CatRepoFileResDto>
+
+    getOneRepoCommit(
+        dto: GetOneRepoCommitReqDto,
+        userId?: number
+    ): Promise<GetOneRepoCommitResDto>
 }

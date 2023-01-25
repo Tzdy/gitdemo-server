@@ -1,5 +1,9 @@
 import { CatRepoFileReqDto, CatRepoFileResDto } from '@/dto/repo/catRepoFileDto'
 import { CreateRepoResDto, CreateRepoReqDto } from '@/dto/repo/createRepoDto'
+import {
+    GetOneRepoCommitReqDto,
+    GetOneRepoCommitResDto,
+} from '@/dto/repo/getOneRepoCommit'
 import { GetOneRepoReqDto, GetOneRepoResDto } from '@/dto/repo/getOneRepoDto'
 import {
     ListAllRepoLanguageReqDto,
@@ -88,13 +92,21 @@ export class RepoRouter {
     @ApiSecurity('token')
     async listRepoRef(
         @Body() dto: ListRepoRefReqDto,
-        @TokenPlyload('id') id: number
+        @TokenPlyload('id') id?: number
     ) {
         return await this.repoService.listRepoRef(dto, id)
     }
 
     @Post('/get_one_latest_commit')
-    async getOneLatestCommit() {}
+    @ApiResponse(200, GetOneRepoCommitResDto)
+    @UseGuards(AvailableTokenMiddleWare)
+    @ApiSecurity('token')
+    async getOneLatestCommit(
+        @Body() dto: GetOneRepoCommitReqDto,
+        @TokenPlyload('id') id?: number
+    ) {
+        return await this.repoService.getOneRepoCommit(dto, id)
+    }
 
     @Post('/list_repo_file')
     @ApiResponse(200, ListRepoFileResDto)
