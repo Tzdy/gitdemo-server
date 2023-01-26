@@ -17,6 +17,7 @@ import {
     GetOneRepoCommitReqDto,
     GetOneRepoCommitResDto,
 } from '@/dto/repo/getOneRepoCommit'
+import { ToggleStarReqDto, ToggleStarResDto } from '@/dto/repo/toggleStarDto'
 
 export interface RepoService {
     createRepo(userId: number, dto: CreateRepoReqDto): Promise<CreateRepoResDto>
@@ -56,4 +57,9 @@ export interface RepoService {
         dto: GetOneRepoCommitReqDto,
         userId?: number
     ): Promise<GetOneRepoCommitResDto>
+
+    toggleRepoStar(
+        dto: ToggleStarReqDto,
+        userId: number
+    ): Promise<ToggleStarResDto>
 }

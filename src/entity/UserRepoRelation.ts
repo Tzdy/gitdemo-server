@@ -1,14 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, PrimaryColumn } from 'typeorm'
 
 @Entity('user_repo_relation')
 export class UserRepoRelation {
-    @PrimaryGeneratedColumn()
-    id: number
-
-    @Column()
+    @PrimaryColumn()
     user_id: number
 
-    @Column()
+    @PrimaryColumn()
     repo_id: number
 
     @Column({

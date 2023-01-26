@@ -5,6 +5,11 @@ export enum RepoType {
     PRIVATE = 1,
 }
 
+export enum ToggleState {
+    ACTIVE = 0,
+    PASSIVE = 1,
+}
+
 export class RepoDto {
     @ApiProperty({
         type: 'number',

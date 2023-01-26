@@ -35,6 +35,8 @@ import {
     GetOneRepoCommitReqDto,
     GetOneRepoCommitResDto,
 } from '@/dto/repo/getOneRepoCommit'
+import { ToggleStarReqDto, ToggleStarResDto } from '@/dto/repo/toggleStarDto'
+import { UserRepoRelation } from '@/entity/UserRepoRelation'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -417,6 +419,41 @@ export class RepoServiceImpl implements RepoService {
             resData.data.nickname = commitUser.nickname
             resData.data.userId = commitUser.id
         }
+        return resData
+    }
+
+    public async toggleRepoStar(
+        dto: ToggleStarReqDto,
+        userId: number
+    ): Promise<ToggleStarResDto> {
+        const repo = await model.manager.findOne(Repo, {
+            where: {
+                id: dto.repoId,
+            },
+        })
+        if (!repo) {
+            throw new HttpOKException(20001, '仓库不存在')
+        }
+        const isMyself = repo.user_id === userId
+        if (!isMyself && repo.type === RepoType.PRIVATE) {
+            throw new HttpOKException(20002, '没有访问权限')
+        }
+        await model.manager.upsert(
+            UserRepoRelation,
+            {
+                user_id: userId,
+                repo_id: dto.repoId,
+                is_star: dto.state,
+            },
+            {
+                conflictPaths: {
+                    user_id: true,
+                    repo_id: true,
+                },
+            }
+        )
+
+        const resData = new ToggleStarResDto()
         return resData
     }
 }

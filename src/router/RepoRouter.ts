@@ -16,6 +16,7 @@ import {
 } from '@/dto/repo/listRepoFileDto'
 import { ListRepoRefReqDto, ListRepoRefResDto } from '@/dto/repo/listRepoRefDto'
 import { SetRepoReqDto, SetRepoResDto } from '@/dto/repo/setRepoDto'
+import { ToggleStarReqDto, ToggleStarResDto } from '@/dto/repo/toggleStarDto'
 import { AvailableTokenMiddleWare, TokenMiddleWare } from '@/middleware/token'
 import { RepoServiceImpl } from '@/service/impl/RepoServiceImpl'
 import {
@@ -128,5 +129,16 @@ export class RepoRouter {
         @TokenPlyload('id') id?: number
     ) {
         return this.repoService.catRepoFile(dto, id)
+    }
+
+    @Post('/toggle_repo_star')
+    @ApiResponse(200, ToggleStarResDto)
+    @UseGuards(TokenMiddleWare)
+    @ApiSecurity('token')
+    async toggleRepoStar(
+        @Body() dto: ToggleStarReqDto,
+        @TokenPlyload('id') id: number
+    ) {
+        return await this.repoService.toggleRepoStar(dto, id)
     }
 }
