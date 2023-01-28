@@ -1,4 +1,4 @@
-import { HttpException } from '@tsdy/express-plugin-exception'
+import { HttpResponse } from '../HttpResponse'
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 
 export class InfoReqDto {}
@@ -70,7 +70,7 @@ class InfoResData {
     info: InfoDto
 }
 
-export class InfoResDto extends HttpException {
+export class InfoResDto extends HttpResponse {
     @ApiProperty({
         type: 'object',
         ref: InfoResData,
