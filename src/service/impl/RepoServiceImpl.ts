@@ -9,7 +9,13 @@ import { User } from '@/entity/User'
 import { model } from '@/model'
 import { HttpAuthException, HttpOKException } from '@/utils/exception'
 import { RepoService } from '@/service/RepoService'
-import { FindOptionsOrder, FindOptionsWhere, Like, Not } from 'typeorm'
+import {
+    DeepPartial,
+    FindOptionsOrder,
+    FindOptionsWhere,
+    Like,
+    Not,
+} from 'typeorm'
 import { createGitUtil } from '@/utils/git'
 import {
     ListRepoFileReqDto,
@@ -136,9 +142,30 @@ export class RepoServiceImpl implements RepoService {
         if (!isMyself) {
             assign(where, 'type', RepoType.PUBLIC)
         }
-        const repo = await model.manager.findOne(Repo, {
-            where,
-        })
+
+        type RepoItem = Repo &
+            PartialNull<
+                Pick<UserRepoRelation, 'is_fork' | 'is_watch' | 'is_star'>
+            >
+
+        const repo = await model
+            .createQueryBuilder(Repo, 'repo')
+            .select('repo.*')
+            .addSelect('user_repo_relation.is_star', 'is_star')
+            .addSelect('user_repo_relation.is_fork', 'is_fork')
+            .addSelect('user_repo_relation.is_watch', 'is_watch')
+            .where('repo.user_id = :user_id', { user_id: user.id })
+            .andWhere('repo.repo_name = :repo_name', {
+                repo_name: dto.repoName,
+            })
+            .leftJoin(
+                UserRepoRelation,
+                'user_repo_relation',
+                `repo.user_id = user_repo_relation.user_id 
+                 AND repo.id = user_repo_relation.repo_id`
+            )
+            .getRawOne<RepoItem>()
+
         if (!repo) {
             throw new HttpOKException(
                 20001,
@@ -152,6 +179,10 @@ export class RepoServiceImpl implements RepoService {
             about: repo.about,
             createTime: repo.create_time.getTime(),
             isOverview: repo.is_overview,
+            isStar:
+                repo.is_star !== null && repo.is_star !== undefined
+                    ? repo.is_star
+                    : 0,
             starNum: repo.star_num,
             type: repo.type,
             updateTime: repo.update_time.getTime(),
@@ -171,7 +202,6 @@ export class RepoServiceImpl implements RepoService {
         userId?: number
     ): Promise<ListRepoResDto> {
         const where: FindOptionsWhere<Repo> = {}
-        const order: FindOptionsOrder<Repo> = {}
         const { isMyself, user } = await this.findUser(dto.username, userId)
         assign(where, 'user_id', user.id)
         if (isMyself) {
@@ -182,34 +212,83 @@ export class RepoServiceImpl implements RepoService {
         assign(where, 'language_id', dto.languageId)
         assign(where, 'repo_name', dto.keyword && Like(`${dto.keyword}%`))
         assign(where, 'is_overview', dto.isOverview && Not(0))
+
+        type RepoItem = Pick<
+            Repo,
+            | 'about'
+            | 'create_time'
+            | 'id'
+            | 'is_overview'
+            | 'language_id'
+            | 'repo_name'
+            | 'star_num'
+            | 'type'
+            | 'update_time'
+        > &
+            PartialNull<
+                Pick<UserRepoRelation, 'is_fork' | 'is_watch' | 'is_star'>
+            >
+
+        const builder = model.createQueryBuilder(Repo, 'repo')
+
+        builder
+            .select('repo.about', 'about')
+            .addSelect('repo.create_time', 'create_time')
+            .addSelect('repo.id', 'id')
+            .addSelect('repo.is_overview', 'is_overview')
+            .addSelect('repo.language_id', 'language_id')
+            .addSelect('repo.repo_name', 'repo_name')
+            .addSelect('repo.star_num', 'star_num')
+            .addSelect('repo.type', 'type')
+            .addSelect('repo.update_time', 'update_time')
+            .addSelect('user_repo_relation.is_star', 'is_star')
+            .addSelect('user_repo_relation.is_fork', 'is_fork')
+            .addSelect('user_repo_relation.is_watch', 'is_watch')
+
+        builder.where('repo.user_id = :user_id', { user_id: user.id })
+        if (typeof dto.repoType === 'number') {
+            let repo_type = dto.repoType
+            if (!isMyself) {
+                repo_type = RepoType.PUBLIC
+            }
+            builder.andWhere('repo.type = :repo_type', {
+                repo_type,
+            })
+        }
+        if (typeof dto.languageId === 'number') {
+            builder.andWhere('repo.language_id = :language_id', {
+                language_id: dto.languageId,
+            })
+        }
+        if (typeof dto.keyword === 'string') {
+            builder.andWhere('repo.repo_name LIKE :keyword%', {
+                keyword: dto.keyword,
+            })
+        }
+        if (typeof dto.isOverview === 'number' && dto.isOverview > 0) {
+            builder.andWhere('repo.is_overview != 0')
+        }
+        builder
+            .skip((dto.page - 1) * dto.pageSize)
+            .limit(dto.pageSize)
+            .leftJoin(
+                UserRepoRelation,
+                'user_repo_relation',
+                `repo.user_id = user_repo_relation.user_id 
+                 AND repo.id = user_repo_relation.repo_id`
+            )
         switch (dto.sort) {
             case ListRepoSortType.LAST_UPDATE:
-                order.update_time = 'DESC'
+                builder.orderBy('update_time', 'DESC')
                 break
             case ListRepoSortType.NAME:
-                order.repo_name = 'ASC'
+                builder.orderBy('repo_name', 'ASC')
                 break
             case ListRepoSortType.STAR:
-                order.star_num = 'DESC'
+                builder.orderBy('star_num', 'DESC')
                 break
         }
-        const list = await model.manager.find(Repo, {
-            select: [
-                'about',
-                'create_time',
-                'id',
-                'is_overview',
-                'language_id',
-                'repo_name',
-                'star_num',
-                'type',
-                'update_time',
-            ],
-            where,
-            order,
-            skip: (dto.page - 1) * dto.pageSize,
-            take: dto.pageSize,
-        })
+        const list = await builder.getRawMany<RepoItem>()
         const resDto = new ListRepoResDto()
         resDto.data = {
             repoList: list.map((repo) => {
@@ -219,6 +298,10 @@ export class RepoServiceImpl implements RepoService {
                     about: repo.about,
                     createTime: repo.create_time.getTime(),
                     isOverview: repo.is_overview,
+                    isStar:
+                        repo.is_star !== null && repo.is_star !== undefined
+                            ? repo.is_star
+                            : 0,
                     starNum: repo.star_num,
                     type: repo.type,
                     updateTime: repo.update_time.getTime(),

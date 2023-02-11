@@ -37,6 +37,11 @@ export class RepoDto {
     starNum: number
 
     @ApiProperty({
+        type: 'number',
+    })
+    isStar: number
+
+    @ApiProperty({
         type: 'integer',
     })
     isOverview: number
