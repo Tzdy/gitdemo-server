@@ -35,9 +35,12 @@ export class GitServiceImpl implements GitService {
         }
         const allBranchList = await gitUtil.showRef()
 
-        // 如果分支数为1并且last为00000可以认为是仓库初始化提交，需要将HEAD移动到对应分支
+        // 如果分支数为1并且last为00000可以认为是仓库初始化提交
+        let isInitCommit = false
         if (allBranchList.length === 1 && /0{36}/.test(last)) {
+            // 需要将HEAD移动到对应分支
             await gitUtil.updateHead(branchName)
+            isInitCommit = true
         }
         const allCommitList = await gitUtil.findAllCommitHash(branchName)
         const commitHashList = (
@@ -80,13 +83,14 @@ export class GitServiceImpl implements GitService {
             }
         })
         languageList.sort((a, b) => b.file_num - a.file_num)
-        await model.manager.update(
-            Repo,
-            { id: repo.id },
-            {
-                language_id: languageList[0].language_id,
-                language_analysis: languageList,
-            }
-        )
+        const repoUpdateVal: Partial<Repo> = {
+            language_id: languageList[0].language_id,
+            language_analysis: languageList,
+        }
+        // 如果是初始提交需要设置默认分支
+        if (isInitCommit) {
+            repoUpdateVal.default_branch_name = branchName
+        }
+        await model.manager.update(Repo, { id: repo.id }, repoUpdateVal)
     }
 }

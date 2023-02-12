@@ -29,6 +29,11 @@ export class Repo {
     repo_name: string
 
     @Column({
+        default: '',
+    })
+    default_branch_name: string
+
+    @Column({
         type: 'timestamp',
         default: () => 'CURRENT_TIMESTAMP',
     })

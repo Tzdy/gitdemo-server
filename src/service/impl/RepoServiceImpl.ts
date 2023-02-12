@@ -175,6 +175,7 @@ export class RepoServiceImpl implements RepoService {
         const resData = new GetOneRepoResDto()
         resData.data = {
             id: repo.id,
+            defaultBranchName: repo.default_branch_name,
             repoName: repo.repo_name,
             about: repo.about,
             createTime: repo.create_time.getTime(),

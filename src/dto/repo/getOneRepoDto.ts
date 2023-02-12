@@ -38,6 +38,11 @@ class Data extends RepoDto {
     website: string
 
     @ApiProperty({
+        type: 'string',
+    })
+    defaultBranchName: string
+
+    @ApiProperty({
         type: 'array',
         items: {
             type: 'object',
