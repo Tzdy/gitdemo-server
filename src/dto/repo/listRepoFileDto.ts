@@ -9,7 +9,7 @@ export class TreeCommitItem {
     @ApiProperty({
         type: 'string',
     })
-    commitTime: Date
+    commitTime: string
     @ApiProperty({
         type: 'string',
     })

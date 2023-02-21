@@ -54,6 +54,11 @@ class Data {
         type: 'number',
     })
     createTime: number
+
+    @ApiProperty({
+        type: 'number',
+    })
+    totalCommitNum: number
 }
 
 export class GetOneRepoCommitResDto extends HttpResponse {

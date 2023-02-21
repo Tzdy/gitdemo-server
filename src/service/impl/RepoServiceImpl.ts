@@ -16,6 +16,7 @@ import {
     Like,
     Not,
 } from 'typeorm'
+import moment from 'moment'
 import { createGitUtil } from '@/utils/git'
 import {
     ListRepoFileReqDto,
@@ -43,6 +44,7 @@ import {
 } from '@/dto/repo/getOneRepoCommit'
 import { ToggleStarReqDto, ToggleStarResDto } from '@/dto/repo/toggleStarDto'
 import { UserRepoRelation } from '@/entity/UserRepoRelation'
+import { Commit } from '@/entity/Commit'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -377,7 +379,13 @@ export class RepoServiceImpl implements RepoService {
         }
         const resDto = new ListRepoFileResDto()
         resDto.data = {
-            list: itemList,
+            list: itemList.map((item) => {
+                const { commitTime, ...result } = item
+                return {
+                    commitTime: moment(commitTime).fromNow(),
+                    ...result,
+                }
+            }),
         }
         return resDto
     }
@@ -472,8 +480,9 @@ export class RepoServiceImpl implements RepoService {
     ): Promise<GetOneRepoCommitResDto> {
         const { isMyself, user } = await this.findUser(dto.username, userId)
         // 目标用户的仓库信息
-        await this.getAndCheckRepo(isMyself, dto.repoName, user.id)
+        const repo = await this.getAndCheckRepo(isMyself, dto.repoName, user.id)
         const gitUtil = createGitUtil(dto.username, dto.repoName)
+        // branch可以是分支名、标签名、commitHash
         const commitList = await gitUtil.findCommit(
             dto.branch,
             1,
@@ -482,8 +491,18 @@ export class RepoServiceImpl implements RepoService {
         )
         const commit = commitList[0]
         if (!commit) {
+            throw new HttpOKException(20003, `分支或commitHash不存在`)
+        }
+
+        const totalCommitNum = await model.manager.count(Commit, {
+            where: {
+                user_id: user.id,
+                repo_id: repo.id,
+            },
+        })
+        if (!commit) {
             throw new HttpOKException(
-                20003,
+                20004,
                 `commit ${dto.commitHash ? dto.commitHash : ''}不存在`
             )
         }
@@ -498,6 +517,7 @@ export class RepoServiceImpl implements RepoService {
             createTime: commit.time.getTime(),
             hash: commit.commitHash,
             username: commit.username,
+            totalCommitNum,
         }
         if (commitUser) {
             resData.data.nickname = commitUser.nickname
