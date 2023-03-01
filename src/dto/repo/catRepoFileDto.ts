@@ -22,6 +22,11 @@ export class CatRepoFileReqDto {
         type: 'string',
     })
     path: string
+
+    @ApiProperty({
+        type: 'number',
+    })
+    raw?: number
 }
 
 class Data {

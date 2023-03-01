@@ -45,6 +45,7 @@ import {
 import { ToggleStarReqDto, ToggleStarResDto } from '@/dto/repo/toggleStarDto'
 import { UserRepoRelation } from '@/entity/UserRepoRelation'
 import { Commit } from '@/entity/Commit'
+import hljs from 'highlight.js'
 
 export class RepoServiceImpl implements RepoService {
     // 获取的是username对应的user
@@ -470,7 +471,9 @@ export class RepoServiceImpl implements RepoService {
             size,
             value,
         }
-
+        if (!dto.raw) {
+            resData.data.value = hljs.highlightAuto(resData.data.value).value
+        }
         return resData
     }
 
