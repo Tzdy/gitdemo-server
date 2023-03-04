@@ -22,6 +22,11 @@ export class GetOneRepoCommitReqDto {
         example: 'string, 不写表示获取最新commit',
     })
     commitHash?: string
+
+    @ApiProperty({
+        type: 'string',
+    })
+    path?: string
 }
 
 class Data {

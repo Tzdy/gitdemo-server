@@ -41,11 +41,7 @@ export function AvailableTokenMiddleWare(
         let json = null
         try {
             json = verify(token) as JwtPayload
-        } catch (err: any) {
-            if (err instanceof TokenExpiredError) {
-                return next(new HttpAuthException(100, 'token expires'))
-            }
-        }
+        } catch (err: any) {}
         if (json) {
             const { id } = json.payload
             req.user = {
@@ -53,7 +49,6 @@ export function AvailableTokenMiddleWare(
             }
             return next()
         }
-        next(new HttpAuthException(101, '重新登陆'))
     } else {
         next()
     }

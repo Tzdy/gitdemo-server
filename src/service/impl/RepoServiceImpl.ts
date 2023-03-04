@@ -490,7 +490,8 @@ export class RepoServiceImpl implements RepoService {
             dto.branch,
             1,
             1,
-            dto.commitHash ? [dto.commitHash] : undefined
+            dto.commitHash ? [dto.commitHash] : undefined,
+            dto.path
         )
         const commit = commitList[0]
         if (!commit) {
