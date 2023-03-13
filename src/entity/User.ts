@@ -16,9 +16,7 @@ export class User {
     })
     password: string
 
-    @Column({
-        unique: true,
-    })
+    @Column()
     nickname: string
 
     @Column({
