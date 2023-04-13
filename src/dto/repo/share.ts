@@ -10,6 +10,18 @@ export enum ToggleState {
     PASSIVE = 1,
 }
 
+export class Language {
+    @ApiProperty({
+        type: 'string'
+    })
+    color: string
+
+    @ApiProperty({
+        type: 'string'
+    })
+    language: string
+}
+
 export class RepoDto {
     @ApiProperty({
         type: 'number',
@@ -59,7 +71,8 @@ export class RepoDto {
 
     // 创建仓库时为空
     @ApiProperty({
-        type: 'string',
+        type: 'object',
+        ref: Language,
     })
-    language: string
+    language: Language
 }

@@ -175,6 +175,25 @@ export class RepoServiceImpl implements RepoService {
             )
         }
         const resData = new GetOneRepoResDto()
+
+        let other: GetOneRepoResDto['data']['languageAnalysis'][0] | null = null
+        const languageAnalysis = repo.language_analysis.map((item) => ({
+            language: parseLanguage(item.language_id),
+            languageId: item.language_id,
+            fileNum: item.file_num,
+        })).filter(item => {
+            // 将Other的文件树累加，Other项过滤掉。
+            if (item.language.language === 'Other') {
+                if (other === null) {
+                    other = item
+                } else {
+                    other.fileNum += item.fileNum
+                    return false
+                }
+            } 
+            return true
+        })
+
         resData.data = {
             id: repo.id,
             defaultBranchName: repo.default_branch_name,
@@ -191,11 +210,7 @@ export class RepoServiceImpl implements RepoService {
             updateTime: repo.update_time.getTime(),
             website: repo.website,
             language: parseLanguage(repo.language_id),
-            languageAnalysis: repo.language_analysis.map((item) => ({
-                language: parseLanguage(item.language_id),
-                languageId: item.language_id,
-                fileNum: item.file_num,
-            })),
+            languageAnalysis,
         }
         return resData
     }
@@ -412,7 +427,7 @@ export class RepoServiceImpl implements RepoService {
         resData.data = {
             languageList: list
                 .map((item) => ({
-                    name: parseLanguage(item.language_id),
+                    name: parseLanguage(item.language_id).language,
                     id: item.language_id,
                 }))
                 .filter((item) => item.name),

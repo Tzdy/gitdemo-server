@@ -1,6 +1,6 @@
 import { ApiProperty } from '@tsdy/express-plugin-swagger'
 import { HttpResponse } from '../HttpResponse'
-import { RepoDto, RepoType } from './share'
+import { Language, RepoDto, RepoType } from './share'
 
 class LanguageItem {
     @ApiProperty({
@@ -9,9 +9,10 @@ class LanguageItem {
     languageId: number
 
     @ApiProperty({
-        type: 'string',
+        type: 'object',
+        ref: Language,
     })
-    language: string
+    language: Language
 
     @ApiProperty({
         type: 'integer',
