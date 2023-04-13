@@ -5,6 +5,7 @@ import { Git as GitUtil } from '@tsdy/git-util'
 import { join } from 'path'
 import { Repo } from '@/entity/Repo'
 import { Commit } from '@/entity/Commit'
+import { parseLanguage } from '@/utils/language'
 export class GitServiceImpl implements GitService {
     async syncCommit(
         repoName: string,
@@ -83,8 +84,16 @@ export class GitServiceImpl implements GitService {
             }
         })
         languageList.sort((a, b) => b.file_num - a.file_num)
+        // 从最主要的往右找第一个非Other的
+        // 实在没有就-1 就是Other
+        const mainLanguageId = languageList.find(item => {
+            const langItem = parseLanguage(item.language_id)
+            if (langItem && langItem.language && langItem.color && langItem.language !== 'Other') {
+                return true
+            }
+        })?.language_id || -1
         const repoUpdateVal: Partial<Repo> = {
-            language_id: languageList[0].language_id,
+            language_id: mainLanguageId,
             language_analysis: languageList,
         }
         // 如果是初始提交需要设置默认分支
